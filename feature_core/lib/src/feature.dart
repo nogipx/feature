@@ -73,7 +73,7 @@ abstract class Feature<V> {
   }
 
   @override
-  String toString() => 'Feature{key: $key, value: $value, type: $type}';
+  String toString() => 'Feature(key: $key, value: $value, type: $type)';
 
   bool? _stringToBool(String data) {
     if (const ['True', 'true', 'TRUE'].contains(data)) {

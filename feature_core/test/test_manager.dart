@@ -5,25 +5,23 @@ import 'package:test/test.dart';
 import 'test_data.dart';
 
 void main() {
-  // group('t', () {
-  //   late final Features manager;
-  //   setUp(() async {
-  //     Features(
-  //       sources: [
-  //         LocalFeatureSource(),
-  //         ServerFeatureSource(),
-  //       ],
-  //     );
-  //     await Features.init();
-  //   });
-  //
-  //   test('Test firebase', () async {
-  //     Features.stream.listen((event) {
-  //       print(event);
-  //     });
-  //     await Future<void>.delayed(const Duration(seconds: 1));
-  //     print(Features.data);
-  //     await Future<void>.delayed(const Duration(seconds: 8));
-  //   });
-  // });
+  group('t', () {
+    test('Test single feature stream', () async {
+      final testSource = TestFeatureSource();
+      final manager = FeaturesManager(
+        sources: [testSource],
+      );
+      manager.featureStream('test1')?.listen((event) {
+        print('Only Test1Feature stream: $event');
+      });
+
+      manager.stream.listen((event) {
+        print('All features update: $event');
+      });
+
+      await manager.init();
+      await Future.delayed(const Duration(seconds: 10));
+      testSource.toggleFirstTestFeature();
+    });
+  });
 }

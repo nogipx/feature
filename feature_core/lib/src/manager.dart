@@ -4,26 +4,48 @@ import 'feature.dart';
 import 'package:rxdart/rxdart.dart';
 
 class FeaturesManager {
-  late final Stream<Map<String, Feature>> stream;
+  StreamSubscription? _combinerSubscription;
 
-  Map<String, Feature> _features = {};
-  Map<String, Feature> get data => Map.unmodifiable(_features);
+  Stream<Map<String, Feature>> get stream => _features.stream;
+
+  late final BehaviorSubject<Map<String, Feature>> _features =
+      BehaviorSubject();
+
+  Map<String, Feature> get data => Map.unmodifiable(_features.value);
 
   final List<FeatureSource> _sources;
 
   FeaturesManager({
     List<FeatureSource> sources = const [],
   }) : _sources = sources {
-    stream = CombineLatestStream(
+    _combinerSubscription = CombineLatestStream(
       sources.map((e) => e.featuresStream),
       (List<Map<String, Feature>> allFeaturesMaps) {
         final flatten =
             Map.fromEntries(allFeaturesMaps.expand((e) => e.entries));
         flatten.remove('');
-        _features = flatten;
         return flatten;
       },
-    );
+    ).listen((value) {
+      _features.sink.add(value);
+    });
+  }
+
+  Stream<Feature>? featureStream(String key) {
+    if (get(key) == null) {
+      return null;
+    }
+
+    return stream.expand((e) => e.values).where((e) => e.key == key);
+
+    return stream.transform(StreamTransformer.fromHandlers(
+      handleData: (data, sink) {
+        final feature = data[key];
+        if (feature != null) {
+          sink.add(feature);
+        }
+      },
+    ));
   }
 
   bool check(String key, dynamic value) =>
@@ -31,7 +53,7 @@ class FeaturesManager {
 
   dynamic value(String key) => get(key)?.dynamicValue;
 
-  Feature? get(String key) => _features[key];
+  Feature? get(String key) => data[key];
 
   Future<void> init() async {
     await Future.forEach<FeatureSource>(
@@ -41,6 +63,7 @@ class FeaturesManager {
   }
 
   void dispose() {
+    _features.close();
     for (var source in _sources) {
       source.dispose();
     }

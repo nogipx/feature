@@ -50,6 +50,6 @@ class FirebaseFeatureSource extends FeatureSource {
   }
 
   Future<void> _onUpdate() async {
-    await pullFeatures();
+    await pull();
   }
 }
