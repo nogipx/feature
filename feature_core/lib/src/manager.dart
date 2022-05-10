@@ -1,30 +1,20 @@
 import 'dart:async';
-import 'package:feature_core/src/feature_source.dart';
+import 'feature_source.dart';
+import 'feature.dart';
 import 'package:rxdart/rxdart.dart';
 
-import 'package:feature_core/src/feature.dart';
-
-class Features {
-  late final Stream<Map<String, Feature>> featuresStream;
+class FeaturesManager {
+  late final Stream<Map<String, Feature>> stream;
 
   Map<String, Feature> _features = {};
-  Map<String, Feature> get features => Map.unmodifiable(_features);
+  Map<String, Feature> get data => Map.unmodifiable(_features);
 
   final List<FeatureSource> _sources;
 
-  static Features? _instance;
-
-  factory Features({
-    List<FeatureSource> sources = const [],
-  }) {
-    _instance ??= Features._(sources: sources);
-    return _instance!;
-  }
-
-  Features._({
+  FeaturesManager({
     List<FeatureSource> sources = const [],
   }) : _sources = sources {
-    featuresStream = CombineLatestStream(
+    stream = CombineLatestStream(
       sources.map((e) => e.featuresStream),
       (List<Map<String, Feature>> allFeaturesMaps) {
         final flatten =
@@ -36,9 +26,12 @@ class Features {
     );
   }
 
-  Feature? get(String key) => _features[key];
+  bool check(String key, dynamic value) =>
+      this.value(key) == value || get(key)?.value == value;
 
   dynamic value(String key) => get(key)?.dynamicValue;
+
+  Feature? get(String key) => _features[key];
 
   Future<void> init() async {
     await Future.forEach<FeatureSource>(
