@@ -4,7 +4,7 @@ import 'package:feature_core/feature_core.dart';
 
 class LocalFeatureSource extends FeatureSource with TogglingSourceMixin {
   LocalFeatureSource({
-    required List<FeatureToggle> features,
+    required List<Feature> features,
   }) {
     updateAllFeatures(features);
   }

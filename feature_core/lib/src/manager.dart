@@ -45,6 +45,11 @@ class FeaturesManager {
 
   Feature? getFeature(String key) => data[key];
 
+  T? getFeatureByType<T extends Feature>() {
+    final feature = getFeature(T.toString());
+    return feature is T ? feature : null;
+  }
+
   T? getSource<T extends FeatureSource>() {
     final match = _sources.whereType<T>();
     return match.isNotEmpty ? match.first : null;

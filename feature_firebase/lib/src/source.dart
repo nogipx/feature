@@ -55,7 +55,7 @@ class FirebaseFeatureSource extends FeatureSource with TogglingSourceMixin {
   }
 
   @override
-  void toggleByType<T>() {
+  void toggleByType<T extends Feature>() {
     throw UnsupportedError(
       'Method is not available for dynamic Firebase source.',
     );

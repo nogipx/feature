@@ -11,15 +11,19 @@ typedef FeatureBuilderCallback<T> = Widget? Function(
 
 class FeatureWidget extends StatefulWidget {
   final Feature? feature;
-  final FeatureBuilderCallback builder;
-  final Widget noFeatureChild;
-  final Widget deactivatedChild;
+  final FeatureBuilderCallback? builder;
+  final Widget? noFeatureChild;
+  final Widget? deactivatedChild;
+  final bool visible;
+  final Widget? child;
 
   const FeatureWidget._({
     required this.feature,
-    required this.builder,
-    this.noFeatureChild = const SizedBox(),
-    this.deactivatedChild = const SizedBox(),
+    this.builder,
+    this.noFeatureChild,
+    this.deactivatedChild,
+    this.visible = true,
+    this.child,
     Key? key,
   }) : super(key: key);
 
@@ -27,28 +31,32 @@ class FeatureWidget extends StatefulWidget {
     required Feature? feature,
     required FeatureBuilderCallback builder,
     Widget noFeatureChild = const SizedBox(),
+    bool visible = true,
     Key? key,
   }) {
     return FeatureWidget._(
       feature: feature,
       builder: builder,
       noFeatureChild: noFeatureChild,
+      visible: visible,
       key: key,
     );
   }
 
-  factory FeatureWidget.toggle({
-    required Feature<bool>? feature,
-    Widget child = const SizedBox(),
-    Widget deactivatedChild = const SizedBox(),
-    Widget noFeatureChild = const SizedBox(),
+  factory FeatureWidget({
+    required Feature? feature,
+    Widget? child,
+    Widget? deactivatedChild,
+    Widget? noFeatureChild,
+    bool visible = true,
     Key? key,
   }) {
     return FeatureWidget._(
       feature: feature,
-      builder: (_, __) => child,
+      child: child,
       noFeatureChild: feature != null ? deactivatedChild : noFeatureChild,
       deactivatedChild: deactivatedChild,
+      visible: visible,
       key: key,
     );
   }
@@ -87,13 +95,28 @@ class _FeatureWidgetState extends State<FeatureWidget> {
   Widget build(BuildContext context) {
     return ValueListenableBuilder<Feature?>(
       valueListenable: _feature,
-      builder: (BuildContext context, feature, Widget? child) {
-        if (feature == null) {
-          return widget.noFeatureChild;
+      builder: (context, feature, _) {
+        const empty = SizedBox();
+
+        if (!widget.visible) {
+          return empty;
         }
+        if (feature == null) {
+          return widget.noFeatureChild ?? empty;
+        }
+        if (feature.isToggle) {
+          if (widget.builder != null) {
+            return widget.builder!.call(context, feature) ?? empty;
+          } else {
+            return feature.value
+                ? widget.child ?? empty
+                : widget.deactivatedChild ?? empty;
+          }
+        }
+
         return feature.enabled
-            ? widget.builder(context, feature) ?? const SizedBox()
-            : widget.deactivatedChild;
+            ? widget.builder?.call(context, feature) ?? widget.child ?? empty
+            : widget.deactivatedChild ?? empty;
       },
     );
   }

@@ -30,6 +30,8 @@ abstract class Features {
 
   static Feature? getFeature(String key) => I.getFeature(key);
 
+  static T? getFeatureByType<T extends Feature>() => I.getFeatureByType<T>();
+
   static T? getSource<T extends FeatureSource>() => I.getSource<T>();
 
   static void dispose() => I.dispose();

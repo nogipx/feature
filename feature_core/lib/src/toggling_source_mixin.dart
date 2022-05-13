@@ -8,9 +8,11 @@ mixin TogglingSourceMixin on FeatureSource {
     }
   }
 
-  void toggleByType<T>() {
-    final key = T.toString();
-    toggle(key);
+  void toggleByType<T extends Feature>() {
+    final feature = getFeatureByType<T>();
+    if (feature != null) {
+      setEnable(feature.key, !feature.enabled);
+    }
   }
 
   void setEnable(String key, bool value) {

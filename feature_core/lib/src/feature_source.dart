@@ -28,6 +28,11 @@ abstract class FeatureSource {
 
   Feature? getFeature(String key) => _features[key];
 
+  T? getFeatureByType<T extends Feature>() {
+    final feature = getFeature(T.toString());
+    return feature is T ? feature : null;
+  }
+
   FutureOr<void> updateFeature(Feature feature) {
     _features[feature.key] = feature;
     _emitUpdate();
