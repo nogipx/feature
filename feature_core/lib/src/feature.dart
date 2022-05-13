@@ -55,7 +55,7 @@ abstract class Feature<V> {
       }
     }
 
-    switch (type) {
+    switch (valueType) {
       case String:
         return value.toString();
       case num:
@@ -84,7 +84,7 @@ abstract class Feature<V> {
         'Example: Feature<$V> creator() => $runtimeType()',
       );
 
-  late final Type type = _type;
+  late final Type valueType = _type;
   Type get _type {
     if (value is String) {
       try {
@@ -114,7 +114,7 @@ abstract class Feature<V> {
 
   @override
   String toString() =>
-      'Feature(key: $_key, value: $value, enabled: $_enabled, type: $type)';
+      'Feature(key: $_key, value: $value, enabled: $_enabled, type: $valueType)';
 
   bool? _stringToBool(String data) {
     if (const ['True', 'true', 'TRUE'].contains(data)) {

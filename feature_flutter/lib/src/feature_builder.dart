@@ -4,10 +4,12 @@ import 'package:feature_core/feature_core.dart';
 import 'package:feature_flutter/src/feature_provider.dart';
 import 'package:flutter/material.dart';
 
-typedef FeatureBuilderCallback<T> = Widget? Function(
+typedef FeatureBuilderCallback<T> = Widget Function(
   BuildContext context,
   Feature<T> feature,
 );
+
+enum _Type { child, builder }
 
 class FeatureWidget extends StatefulWidget {
   final Feature? feature;
@@ -16,9 +18,11 @@ class FeatureWidget extends StatefulWidget {
   final Widget? deactivatedChild;
   final bool visible;
   final Widget? child;
+  final _Type type;
 
   const FeatureWidget._({
     required this.feature,
+    required this.type,
     this.builder,
     this.noFeatureChild,
     this.deactivatedChild,
@@ -40,6 +44,7 @@ class FeatureWidget extends StatefulWidget {
       noFeatureChild: noFeatureChild,
       visible: visible,
       key: key,
+      type: _Type.builder,
     );
   }
 
@@ -54,10 +59,11 @@ class FeatureWidget extends StatefulWidget {
     return FeatureWidget._(
       feature: feature,
       child: child,
-      noFeatureChild: feature != null ? deactivatedChild : noFeatureChild,
+      noFeatureChild: noFeatureChild,
       deactivatedChild: deactivatedChild,
       visible: visible,
       key: key,
+      type: _Type.child,
     );
   }
 
@@ -100,23 +106,17 @@ class _FeatureWidgetState extends State<FeatureWidget> {
 
         if (!widget.visible) {
           return empty;
-        }
-        if (feature == null) {
+        } else if (feature == null) {
           return widget.noFeatureChild ?? empty;
         }
-        if (feature.isToggle) {
-          if (widget.builder != null) {
-            return widget.builder!.call(context, feature) ?? empty;
-          } else {
-            return feature.value
-                ? widget.child ?? empty
-                : widget.deactivatedChild ?? empty;
-          }
-        }
 
-        return feature.enabled
-            ? widget.builder?.call(context, feature) ?? widget.child ?? empty
-            : widget.deactivatedChild ?? empty;
+        if (widget.type == _Type.builder) {
+          return widget.builder?.call(context, feature) ?? empty;
+        } else {
+          return feature.value
+              ? widget.child ?? empty
+              : widget.deactivatedChild ?? empty;
+        }
       },
     );
   }
