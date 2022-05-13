@@ -1,19 +1,11 @@
 import 'package:feature_core/feature_core.dart';
 
-class FirebaseFeature extends Feature<dynamic> {
-  @override
-  final String key;
-  @override
-  final dynamic value;
-  @override
-  final bool isEnabled;
-  @override
-  final String? name;
-
+class FirebaseFeature<T extends dynamic> extends Feature<T> {
   FirebaseFeature({
-    required this.key,
-    this.value,
-    this.isEnabled = false,
-    this.name,
-  });
+    required String key,
+    required T value,
+  }) : super(key: key, value: value);
+
+  @override
+  Feature<T> creator() => FirebaseFeature(key: key, value: value);
 }

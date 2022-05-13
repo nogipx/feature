@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:meta/meta.dart';
 
 enum FeatureType {
   string,
@@ -8,72 +9,112 @@ enum FeatureType {
   unknown,
 }
 
+abstract class FeatureToggle extends Feature<bool> {
+  FeatureToggle({required bool value, bool? enabled})
+      : super(value: value, enabled: enabled ?? value);
+}
+
 abstract class Feature<V> {
-  String get key;
-  String? get name;
-  V get value;
-  bool get isEnabled;
+  late String _key;
+  String get key => _key;
+
+  late V _value;
+  V get value => isToggle ? _enabled as V : _value;
+
+  late bool _enabled;
+  bool get enabled => _enabled;
+
+  bool get isToggle => V == bool;
+
+  Feature({
+    String? key,
+    required V value,
+    bool? enabled,
+  }) : _value = value {
+    _enabled = value is bool ? (enabled ?? value) : true;
+    _key = key ?? runtimeType.toString();
+  }
 
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
       other is Feature &&
-          runtimeType == other.runtimeType &&
-          key == other.key &&
-          value == other.value;
+          _key == other._key &&
+          value == other.value &&
+          enabled == other.enabled;
 
   @override
-  int get hashCode => Object.hash(key, value);
+  int get hashCode => Object.hash(key, value, enabled);
 
   dynamic get dynamicValue {
+    dynamic json(String data) {
+      try {
+        return jsonDecode(data);
+      } catch (_) {
+        return null;
+      }
+    }
+
     switch (type) {
-      case FeatureType.string:
+      case String:
         return value.toString();
-      case FeatureType.number:
+      case num:
         return num.parse(value.toString());
-      case FeatureType.boolean:
+      case bool:
         return _stringToBool(value.toString());
-      case FeatureType.json:
-        try {
-          return jsonDecode(value.toString());
-        } catch (_) {
-          return null;
-        }
+      case Map:
+        return json(value.toString());
+      case List:
+        return json(value.toString());
       default:
         return FeatureType.unknown;
     }
   }
 
-  late final FeatureType type = _type;
-  FeatureType get _type {
+  Feature<V> copyWith({V? value, bool? enabled}) {
+    final obj = creator();
+    obj._value = value ?? this.value;
+    obj._enabled = enabled ?? this.enabled;
+    return obj;
+  }
+
+  Feature<V> creator() => throw UnimplementedError(
+        'Implement the creator() method in your $runtimeType class. \n'
+        'It should return just new object of your class. \n'
+        'Example: Feature<$V> creator() => $runtimeType()',
+      );
+
+  late final Type type = _type;
+  Type get _type {
     if (value is String) {
       try {
         if (_stringToBool(value as String) != null) {
-          return FeatureType.boolean;
+          return bool;
         }
 
-        final num = int.tryParse(value as String);
-        if (num != null) {
-          return FeatureType.number;
+        final number = num.tryParse(value as String);
+        if (number != null) {
+          return num;
         }
 
         final json = jsonDecode(value as String);
         if (json != null && (json is List || json is Map)) {
-          return FeatureType.json;
+          return json.runtimeType;
         }
       } catch (_) {
-        return FeatureType.string;
+        return String;
       }
     } else if (value is bool) {
-      return FeatureType.boolean;
+      return bool;
     } else if (value is num) {
-      return FeatureType.number;
+      return num;
     }
-    return FeatureType.unknown;
+    return Null;
   }
 
   @override
-  String toString() => 'Feature(key: $key, value: $value, type: $type)';
+  String toString() =>
+      'Feature(key: $_key, value: $value, enabled: $_enabled, type: $type)';
 
   bool? _stringToBool(String data) {
     if (const ['True', 'true', 'TRUE'].contains(data)) {
@@ -87,15 +128,5 @@ abstract class Feature<V> {
 }
 
 class StubFeature extends Feature<void> {
-  @override
-  String get key => '';
-
-  @override
-  String? get name {}
-
-  @override
-  void get value {}
-
-  @override
-  bool get isEnabled => false;
+  StubFeature() : super(value: '');
 }

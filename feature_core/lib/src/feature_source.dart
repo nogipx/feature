@@ -11,25 +11,33 @@ abstract class FeatureSource {
 
   late final StreamSubscription _listenNewState;
 
-  Stream<Map<String, Feature>> get featuresStream => _subject.stream;
+  Stream<Map<String, Feature>> get stream => _subject.stream;
 
   Map<String, Feature> _features = {};
-  Map<String, Feature> get features => Map.unmodifiable(_features);
+  Map<String, Feature> get data => Map.unmodifiable(_features);
 
   FeatureSource() {
-    _listenNewState = featuresStream.listen((e) {
+    _listenNewState = stream.listen((e) {
       _features = e;
     });
   }
 
-  bool containsFeature(String key) => feature(key) != null;
+  void _emitUpdate() => _subject.add(_features);
 
-  Feature? feature(String key) => _features[key];
+  bool containsFeature(String key) => getFeature(key) != null;
 
-  @protected
-  FutureOr<void> addFeature(Feature feature) {
+  Feature? getFeature(String key) => _features[key];
+
+  FutureOr<void> updateFeature(Feature feature) {
     _features[feature.key] = feature;
-    _subject.add(_features);
+    _emitUpdate();
+  }
+
+  FutureOr<void> updateAllFeatures(Iterable<Feature> features) {
+    for (final feature in features) {
+      _features[feature.key] = feature;
+    }
+    _emitUpdate();
   }
 
   @protected
@@ -44,7 +52,7 @@ abstract class FeatureSource {
   FutureOr<void> pull() async {
     try {
       final features = await pullFeatures();
-      _subject.add(_processNewFeatures(features));
+      updateAllFeatures(features);
     } on Exception catch (e, stackTrace) {
       print(e.toString());
       dev.log(
@@ -59,9 +67,5 @@ abstract class FeatureSource {
   void dispose() {
     _listenNewState.cancel();
     _subject.close();
-  }
-
-  Map<String, Feature> _processNewFeatures(Iterable<Feature> data) {
-    return Map.fromEntries(data.map((e) => MapEntry(e.key, e)));
   }
 }

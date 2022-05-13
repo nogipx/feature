@@ -1,5 +1,6 @@
 import 'exception.dart';
 import 'feature.dart';
+import 'feature_source.dart';
 import 'manager.dart';
 
 abstract class Features {
@@ -23,11 +24,13 @@ abstract class Features {
   }
 
   static bool check(String key, dynamic value) =>
-      I.value(key) == value || I.get(key)?.value == value;
+      I.value(key) == value || I.getFeature(key)?.value == value;
 
-  static dynamic value(String key) => I.get(key)?.dynamicValue;
+  static dynamic value(String key) => I.getFeature(key)?.dynamicValue;
 
-  static Feature? get(String key) => I.data[key];
+  static Feature? getFeature(String key) => I.getFeature(key);
+
+  static T? getSource<T extends FeatureSource>() => I.getSource<T>();
 
   static void dispose() => I.dispose();
 }

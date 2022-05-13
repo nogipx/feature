@@ -7,7 +7,7 @@ import 'package:meta/meta.dart';
 
 import 'feature.dart';
 
-class FirebaseFeatureSource extends FeatureSource {
+class FirebaseFeatureSource extends FeatureSource with TogglingSourceMixin {
   final Duration minimumFetchInterval;
   final Duration fetchTimeout;
 
@@ -36,20 +36,28 @@ class FirebaseFeatureSource extends FeatureSource {
   @override
   @protected
   FutureOr<Iterable<Feature>> pullFeatures() async {
-    final features = _remoteConfig
-        .getAll()
-        .entries
-        .map(
-          (e) => FirebaseFeature(
-            key: e.key,
-            value: e.value.asString(),
-          ),
-        )
-        .toList();
+    final features = _remoteConfig.getAll().entries.map((e) {
+      final raw = FirebaseFeature(
+        key: e.key,
+        value: e.value.asString(),
+      );
+      if (raw.dynamicValue is bool) {
+        return FirebaseFeature<bool>(key: raw.key, value: raw.dynamicValue);
+      }
+      return raw;
+    }).toList();
+
     return features;
   }
 
   Future<void> _onUpdate() async {
     await pull();
+  }
+
+  @override
+  void toggleByType<T>() {
+    throw UnsupportedError(
+      'Method is not available for dynamic Firebase source.',
+    );
   }
 }

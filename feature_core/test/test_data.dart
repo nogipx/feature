@@ -3,45 +3,15 @@ import 'dart:async';
 import 'package:feature_core/feature_core.dart';
 
 class SearchFeature extends Feature<bool> {
-  @override
-  String? get name => runtimeType.toString();
-
-  @override
-  String get key => 'search_feature';
-
-  @override
-  bool get value => true;
-
-  @override
-  bool get isEnabled => true;
+  SearchFeature() : super(value: true, enabled: true);
 }
 
-class OAuthFeature extends Feature<bool> {
-  @override
-  String? get name => runtimeType.toString();
-
-  @override
-  String get key => 'oauth_feature';
-
-  @override
-  bool get value => false;
-
-  @override
-  bool get isEnabled => false;
+class OAuthFeature extends FeatureToggle {
+  OAuthFeature() : super(value: false);
 }
 
 class TestFeature extends Feature<bool> {
-  @override
-  final bool value;
-  final String key;
-
-  TestFeature(this.key, this.value);
-
-  @override
-  String? get name => runtimeType.toString();
-
-  @override
-  bool get isEnabled => true;
+  TestFeature(String key, bool value) : super(key: key, value: value);
 }
 
 class LocalFeatureSource extends FeatureSource {

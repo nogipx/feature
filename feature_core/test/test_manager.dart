@@ -9,7 +9,7 @@ void main() {
     test('Test single feature stream', () async {
       final testSource = TestFeatureSource();
       final manager = FeaturesManager(
-        sources: [testSource],
+        sources: {testSource},
       );
       manager.featureStream('test1')?.listen((event) {
         print('Only Test1Feature stream: $event');
