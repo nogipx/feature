@@ -19,7 +19,7 @@ abstract class Feature<V> {
   String get key => _key;
 
   late V _value;
-  V get value => isToggle ? _enabled as V : _value;
+  V get value => _value;
 
   late bool _enabled;
   bool get enabled => _enabled;

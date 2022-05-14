@@ -6,7 +6,7 @@ import 'package:flutter/material.dart';
 
 typedef FeatureBuilderCallback<T> = Widget Function(
   BuildContext context,
-  Feature<T> feature,
+  Feature<T>? feature,
 );
 
 enum _Type { child, builder }
@@ -14,34 +14,35 @@ enum _Type { child, builder }
 class FeatureWidget extends StatefulWidget {
   final Feature? feature;
   final FeatureBuilderCallback? builder;
-  final Widget? noFeatureChild;
-  final Widget? deactivatedChild;
-  final bool visible;
+  final Widget? activatedChild;
+
+  /// Represents original widget before experiment.
+  /// It will be used if feature is missing or disabled.
   final Widget? child;
+
+  /// Controls whether widget should not builds at all.
+  final bool visible;
   final _Type type;
 
   const FeatureWidget._({
     required this.feature,
     required this.type,
     this.builder,
-    this.noFeatureChild,
-    this.deactivatedChild,
+    this.activatedChild,
     this.visible = true,
     this.child,
     Key? key,
   }) : super(key: key);
 
   factory FeatureWidget.builder({
-    required Feature? feature,
+    Feature? feature,
     required FeatureBuilderCallback builder,
-    Widget noFeatureChild = const SizedBox(),
     bool visible = true,
     Key? key,
   }) {
     return FeatureWidget._(
       feature: feature,
       builder: builder,
-      noFeatureChild: noFeatureChild,
       visible: visible,
       key: key,
       type: _Type.builder,
@@ -49,18 +50,16 @@ class FeatureWidget extends StatefulWidget {
   }
 
   factory FeatureWidget({
-    required Feature? feature,
+    Feature? feature,
     Widget? child,
-    Widget? deactivatedChild,
-    Widget? noFeatureChild,
+    Widget? activatedChild,
     bool visible = true,
     Key? key,
   }) {
     return FeatureWidget._(
       feature: feature,
       child: child,
-      noFeatureChild: noFeatureChild,
-      deactivatedChild: deactivatedChild,
+      activatedChild: activatedChild,
       visible: visible,
       key: key,
       type: _Type.child,
@@ -107,15 +106,17 @@ class _FeatureWidgetState extends State<FeatureWidget> {
         if (!widget.visible) {
           return empty;
         } else if (feature == null) {
-          return widget.noFeatureChild ?? empty;
+          return widget.type == _Type.builder
+              ? widget.builder?.call(context, feature) ?? empty
+              : widget.child ?? empty;
         }
 
         if (widget.type == _Type.builder) {
           return widget.builder?.call(context, feature) ?? empty;
         } else {
-          return feature.value
-              ? widget.child ?? empty
-              : widget.deactivatedChild ?? empty;
+          return feature.enabled
+              ? widget.activatedChild ?? empty
+              : widget.child ?? empty;
         }
       },
     );
