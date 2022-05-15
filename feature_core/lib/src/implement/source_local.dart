@@ -11,6 +11,6 @@ class LocalFeatureSource extends FeatureSource with TogglingSourceMixin {
 
   @override
   FutureOr<Iterable<Feature>> pullFeatures() {
-    return data.values;
+    return features.values;
   }
 }

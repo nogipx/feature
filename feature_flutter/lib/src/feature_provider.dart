@@ -5,8 +5,8 @@ class FeaturesProvider extends InheritedWidget {
   final FeaturesManager manager;
 
   const FeaturesProvider({
-    required Widget child,
     required this.manager,
+    required Widget child,
     Key? key,
   }) : super(child: child, key: key);
 

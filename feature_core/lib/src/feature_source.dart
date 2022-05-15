@@ -14,11 +14,12 @@ abstract class FeatureSource {
   Stream<Map<String, Feature>> get stream => _subject.stream;
 
   Map<String, Feature> _features = {};
-  Map<String, Feature> get data => Map.unmodifiable(_features);
+  Map<String, Feature> get features => Map.unmodifiable(_features);
 
   FeatureSource() {
     _listenNewState = stream.listen((e) {
       _features = e;
+      _features.remove('');
     });
   }
 

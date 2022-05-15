@@ -14,6 +14,7 @@ class FeaturesManager {
   Map<String, Feature> get data => Map.unmodifiable(_features.value);
 
   final Set<FeatureSource> _sources;
+  Set<FeatureSource> get sources => Set.unmodifiable(_sources);
 
   FeaturesManager({
     Set<FeatureSource> sources = const {},
