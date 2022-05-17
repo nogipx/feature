@@ -5,7 +5,13 @@ import 'package:feature_core/feature_core.dart';
 class TogglingFeatureSourceWrapper implements FeatureSource {
   final FeatureSource source;
 
-  TogglingFeatureSourceWrapper(this.source);
+  @override
+  String name;
+
+  TogglingFeatureSourceWrapper({
+    required this.source,
+    this.name = '',
+  });
 
   @override
   bool containsFeature(String key) => source.containsFeature(key);

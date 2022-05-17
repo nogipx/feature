@@ -6,6 +6,8 @@ import 'package:rxdart/rxdart.dart';
 import 'package:meta/meta.dart';
 
 abstract class FeatureSource {
+  late final String name;
+
   late final BehaviorSubject<Map<String, Feature>> _subject =
       BehaviorSubject.seeded({'': StubFeature()});
 
@@ -16,7 +18,7 @@ abstract class FeatureSource {
   Map<String, Feature> _features = {};
   Map<String, Feature> get features => Map.unmodifiable(_features);
 
-  FeatureSource() {
+  FeatureSource({this.name = ''}) {
     _listenNewState = stream.listen((e) {
       _features = e;
       _features.remove('');

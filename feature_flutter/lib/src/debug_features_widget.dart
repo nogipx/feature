@@ -44,7 +44,9 @@ class _DebugFeaturesWidgetState extends State<DebugFeaturesWidget> {
                     crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: [
                       Text(
-                        source.runtimeType.toString(),
+                        source.name.isNotEmpty
+                            ? source.name
+                            : source.runtimeType.toString(),
                         style: Theme.of(context)
                             .textTheme
                             .headline6

@@ -10,10 +10,14 @@ class RetainFeatureSourceWrapper implements TogglingFeatureSourceWrapper {
   final SharedPreferences preferences;
   final String tag;
 
+  @override
+  String name;
+
   RetainFeatureSourceWrapper({
     required this.source,
     required this.preferences,
     required this.tag,
+    this.name = '',
   });
 
   @override
