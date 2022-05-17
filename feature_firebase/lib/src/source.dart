@@ -19,7 +19,7 @@ class FirebaseFeatureSource extends FeatureSource {
     this.fetchTimeout = const Duration(minutes: 1),
   }) : _remoteConfig = remoteConfig {
     _remoteConfig
-      // ..addListener(_onUpdate)
+      ..addListener(_onUpdate)
       ..setConfigSettings(RemoteConfigSettings(
         fetchTimeout: fetchTimeout,
         minimumFetchInterval: minimumFetchInterval,
@@ -30,7 +30,7 @@ class FirebaseFeatureSource extends FeatureSource {
   @override
   void dispose() {
     super.dispose();
-    // _remoteConfig.removeListener(_onUpdate);
+    _remoteConfig.removeListener(_onUpdate);
   }
 
   @override
@@ -51,6 +51,6 @@ class FirebaseFeatureSource extends FeatureSource {
   }
 
   Future<void> _onUpdate() async {
-    await pull();
+    notifyNeedUpdate();
   }
 }

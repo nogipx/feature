@@ -48,6 +48,12 @@ class TogglingFeatureSourceWrapper implements FeatureSource {
   FutureOr<void> updateFeature(Feature feature) =>
       source.updateFeature(feature);
 
+  @override
+  void notifyNeedUpdate() => source.notifyNeedUpdate();
+
+  @override
+  FutureOr<void> onReceiveNeedUpdate() {}
+
   void toggle(String key) {
     final feature = getFeature(key);
     if (feature != null) {

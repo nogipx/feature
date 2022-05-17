@@ -11,7 +11,10 @@ abstract class FeatureSource {
   late final BehaviorSubject<Map<String, Feature>> _subject =
       BehaviorSubject.seeded({'': StubFeature()});
 
+  late final BehaviorSubject<bool> _needUpdate = BehaviorSubject.seeded(false);
+
   late final StreamSubscription _listenNewState;
+  late final StreamSubscription _listenMarkUpdate;
 
   Stream<Map<String, Feature>> get stream => _subject.stream;
 
@@ -23,7 +26,19 @@ abstract class FeatureSource {
       _features = e;
       _features.remove('');
     });
+    _listenMarkUpdate = _needUpdate.listen((flag) {
+      if (flag) {
+        onReceiveNeedUpdate();
+      }
+    });
   }
+
+  @mustCallSuper
+  FutureOr<void> onReceiveNeedUpdate() {
+    _needUpdate.add(false);
+  }
+
+  void notifyNeedUpdate() => _needUpdate.add(true);
 
   void _emitUpdate() => _subject.add(_features);
 
@@ -74,6 +89,8 @@ abstract class FeatureSource {
   @mustCallSuper
   void dispose() {
     _listenNewState.cancel();
+    _listenMarkUpdate.cancel();
     _subject.close();
+    _needUpdate.close();
   }
 }

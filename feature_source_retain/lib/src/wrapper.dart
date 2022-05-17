@@ -5,6 +5,8 @@ import 'package:feature_core/feature_core.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class RetainFeatureSourceWrapper implements TogglingFeatureSourceWrapper {
+  late final _key = 'retain_feature_source#$tag';
+
   @override
   final TogglingFeatureSourceWrapper source;
   final SharedPreferences preferences;
@@ -55,8 +57,6 @@ class RetainFeatureSourceWrapper implements TogglingFeatureSourceWrapper {
   @override
   void toggleByType<T extends Feature>() => source.toggleByType<T>();
 
-  late final _key = 'retain_feature_source#$tag';
-
   @override
   void toggle(String key) {
     source.toggle(key);
@@ -74,6 +74,14 @@ class RetainFeatureSourceWrapper implements TogglingFeatureSourceWrapper {
         await preferences.remove(_serializeFeatureKey(e.key));
       },
     ));
+  }
+
+  @override
+  void notifyNeedUpdate() => source.notifyNeedUpdate();
+
+  @override
+  FutureOr<void> onReceiveNeedUpdate() async {
+    await pull();
   }
 
   @override
