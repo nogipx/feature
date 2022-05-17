@@ -2,7 +2,7 @@ import 'dart:async';
 
 import 'package:feature_core/feature_core.dart';
 
-class LocalFeatureSource extends FeatureSource with TogglingSourceMixin {
+class LocalFeatureSource extends FeatureSource {
   LocalFeatureSource({
     required List<Feature> features,
   }) {

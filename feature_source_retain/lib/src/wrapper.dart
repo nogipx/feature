@@ -4,19 +4,58 @@ import 'dart:convert';
 import 'package:feature_core/feature_core.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-class RetainFeatureSource extends LocalFeatureSource {
-  static const _key = 'retain_feature_source';
-
+class RetainFeatureSourceWrapper implements TogglingFeatureSourceWrapper {
+  @override
+  final TogglingFeatureSourceWrapper source;
   final SharedPreferences preferences;
+  final String tag;
 
-  RetainFeatureSource({
+  RetainFeatureSourceWrapper({
+    required this.source,
     required this.preferences,
-    required List<Feature> features,
-  }) : super(features: features);
+    required this.tag,
+  });
+
+  @override
+  bool containsFeature(String key) => source.containsFeature(key);
+
+  @override
+  void dispose() => source.dispose();
+
+  @override
+  Map<String, Feature> get features => source.features;
+
+  @override
+  Feature? getFeature(String key) => source.getFeature(key);
+
+  @override
+  T? getFeatureByType<T extends Feature>() => source.getFeatureByType<T>();
+
+  @override
+  FutureOr<void> pull() async => updateAllFeatures(await pullFeatures());
+
+  @override
+  Stream<Map<String, Feature>> get stream => source.stream;
+
+  @override
+  FutureOr<void> updateAllFeatures(Iterable<Feature> features) =>
+      source.updateAllFeatures(features);
+
+  @override
+  FutureOr<void> updateFeature(Feature feature) =>
+      source.updateFeature(feature);
+
+  @override
+  void setEnable(String key, bool value) => source.setEnable(key, value);
+
+  @override
+  void toggleByType<T extends Feature>() => source.toggleByType<T>();
+
+  late final _key = 'retain_feature_source#$tag';
 
   @override
   void toggle(String key) {
-    super.toggle(key);
+    source.toggle(key);
     final updatedFeature = getFeature(key);
     if (updatedFeature != null) {
       _persistFeature(updatedFeature);
@@ -25,7 +64,7 @@ class RetainFeatureSource extends LocalFeatureSource {
 
   @override
   FutureOr<void> reset() async {
-    super.reset();
+    source.reset();
     await Future.wait(features.values.map(
       (e) async {
         await preferences.remove(_serializeFeatureKey(e.key));
@@ -35,7 +74,8 @@ class RetainFeatureSource extends LocalFeatureSource {
 
   @override
   FutureOr<Iterable<Feature>> pullFeatures() async {
-    final features = Map.of(this.features);
+    final pulled = await source.pullFeatures();
+    final features = Map.fromEntries(pulled.map((e) => MapEntry(e.key, e)));
     final savedKeys = preferences.getKeys().where((e) => e.endsWith(_key));
 
     if (features.isEmpty) {

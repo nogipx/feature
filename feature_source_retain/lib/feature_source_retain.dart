@@ -1,3 +1,4 @@
 library feature_source_retain;
 
-export 'src/source.dart';
+export 'src/mixin.dart';
+export 'src/wrapper.dart';

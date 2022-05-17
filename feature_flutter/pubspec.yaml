@@ -11,9 +11,9 @@ dependencies:
   flutter:
     sdk: flutter
   rxdart: ^0.27.3
-  feature_core: ^1.0.0
-#  feature_core:
-#    path: ../feature_core
+#  feature_core: ^1.0.0
+  feature_core:
+    path: ../feature_core
 
 dev_dependencies:
   flutter_test:

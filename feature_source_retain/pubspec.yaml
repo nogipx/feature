@@ -7,7 +7,9 @@ environment:
   sdk: '>=2.14.2 <3.0.0'
 
 dependencies:
-  feature_core: ^1.0.0
+#  feature_core: ^1.0.0
+  feature_core:
+    path: /Users/nogipx/Documents/Projects/nogipx/feature/feature_core
   shared_preferences: ^2.0.15
 
 dev_dependencies:

@@ -27,7 +27,9 @@ class _DebugFeaturesWidgetState extends State<DebugFeaturesWidget> {
           shrinkWrap: true,
           itemBuilder: (context, index) {
             final source = _sources[index];
-            final sourceSupportToggling = source is TogglingSourceMixin;
+            final useWrapper = source is TogglingFeatureSourceWrapper;
+            final useMixin = source is TogglingSourceMixin;
+            final supportToggling = useWrapper || useMixin;
 
             return StreamBuilder<Map<String, Feature>>(
               stream: source.stream,
@@ -72,17 +74,23 @@ class _DebugFeaturesWidgetState extends State<DebugFeaturesWidget> {
                           itemBuilder: (context, index) {
                             final feature = data[index];
                             return BouncingWidget(
-                              enableBounce: sourceSupportToggling,
-                              onTap: sourceSupportToggling
+                              enableBounce: supportToggling,
+                              onTap: supportToggling
                                   ? () {
-                                      (source as TogglingSourceMixin)
-                                          .toggle(feature.key);
+                                      if (useMixin) {
+                                        (source as TogglingSourceMixin)
+                                            .toggle(feature.key);
+                                      }
+                                      if (useWrapper) {
+                                        (source as TogglingFeatureSourceWrapper)
+                                            .toggle(feature.key);
+                                      }
                                     }
                                   : null,
                               child: Material(
                                 borderRadius: BorderRadius.circular(16),
                                 elevation: 1,
-                                color: sourceSupportToggling
+                                color: supportToggling
                                     ? feature.enabled
                                         ? Colors.green.shade100
                                         : Colors.red.shade100
@@ -95,9 +103,6 @@ class _DebugFeaturesWidgetState extends State<DebugFeaturesWidget> {
                                   constraints: const BoxConstraints(
                                     minHeight: 40,
                                   ),
-                                  // decoration: BoxDecoration(
-                                  //   boxShadow:
-                                  // ),
                                   child: Row(
                                     mainAxisAlignment:
                                         MainAxisAlignment.spaceBetween,
