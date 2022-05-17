@@ -49,74 +49,86 @@ class _DebugFeaturesWidgetState extends State<DebugFeaturesWidget> {
                             ?.copyWith(color: Colors.grey),
                       ),
                       const SizedBox(height: 12),
-                      ListView.separated(
-                        itemCount: data.length,
-                        primary: false,
-                        shrinkWrap: true,
-                        separatorBuilder: (_, __) => const SizedBox(
-                          height: 8,
+                      if (data.isEmpty)
+                        Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 16),
+                          child: Text(
+                            'No features',
+                            style: Theme.of(context)
+                                .textTheme
+                                .bodyText2
+                                ?.copyWith(color: Colors.grey),
+                          ),
                         ),
-                        physics: const NeverScrollableScrollPhysics(),
-                        itemBuilder: (context, index) {
-                          final feature = data[index];
-                          return BouncingWidget(
-                            enableBounce: sourceSupportToggling,
-                            onTap: sourceSupportToggling
-                                ? () {
-                                    (source as TogglingSourceMixin)
-                                        .toggle(feature.key);
-                                  }
-                                : null,
-                            child: Material(
-                              borderRadius: BorderRadius.circular(16),
-                              elevation: 1,
-                              color: sourceSupportToggling
-                                  ? feature.enabled
-                                      ? Colors.green.shade100
-                                      : Colors.red.shade100
-                                  : Colors.white,
-                              child: Container(
-                                padding: const EdgeInsets.symmetric(
-                                  horizontal: 16,
-                                  vertical: 8,
-                                ),
-                                constraints: const BoxConstraints(
-                                  minHeight: 40,
-                                ),
-                                // decoration: BoxDecoration(
-                                //   boxShadow:
-                                // ),
-                                child: Row(
-                                  mainAxisAlignment:
-                                      MainAxisAlignment.spaceBetween,
-                                  children: [
-                                    Expanded(
-                                      flex: 3,
-                                      child: Text(
-                                        feature.key,
-                                        style: Theme.of(context)
-                                            .textTheme
-                                            .bodyText1,
+                      if (data.isNotEmpty)
+                        ListView.separated(
+                          itemCount: data.length,
+                          primary: false,
+                          shrinkWrap: true,
+                          separatorBuilder: (_, __) => const SizedBox(
+                            height: 8,
+                          ),
+                          physics: const NeverScrollableScrollPhysics(),
+                          itemBuilder: (context, index) {
+                            final feature = data[index];
+                            return BouncingWidget(
+                              enableBounce: sourceSupportToggling,
+                              onTap: sourceSupportToggling
+                                  ? () {
+                                      (source as TogglingSourceMixin)
+                                          .toggle(feature.key);
+                                    }
+                                  : null,
+                              child: Material(
+                                borderRadius: BorderRadius.circular(16),
+                                elevation: 1,
+                                color: sourceSupportToggling
+                                    ? feature.enabled
+                                        ? Colors.green.shade100
+                                        : Colors.red.shade100
+                                    : Colors.white,
+                                child: Container(
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 16,
+                                    vertical: 8,
+                                  ),
+                                  constraints: const BoxConstraints(
+                                    minHeight: 40,
+                                  ),
+                                  // decoration: BoxDecoration(
+                                  //   boxShadow:
+                                  // ),
+                                  child: Row(
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      Expanded(
+                                        flex: 3,
+                                        child: Text(
+                                          feature.key,
+                                          style: Theme.of(context)
+                                              .textTheme
+                                              .bodyText1,
+                                        ),
                                       ),
-                                    ),
-                                    const SizedBox(width: 8),
-                                    Expanded(
-                                      flex: 2,
-                                      child: Text(
-                                        feature.value.toString(),
-                                        textAlign: TextAlign.center,
-                                        style: Theme.of(context)
-                                            .textTheme
-                                            .bodyText2,
+                                      const SizedBox(width: 8),
+                                      Expanded(
+                                        flex: 2,
+                                        child: Text(
+                                          feature.value.toString(),
+                                          textAlign: TextAlign.center,
+                                          style: Theme.of(context)
+                                              .textTheme
+                                              .bodyText2,
+                                        ),
                                       ),
-                                    ),
-                                  ],
+                                    ],
+                                  ),
                                 ),
                               ),
-                            ),
-                          );
-                        },
-                      ),
+                            );
+                          },
+                        ),
                     ],
                   ),
                 );

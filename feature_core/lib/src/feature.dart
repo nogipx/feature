@@ -78,11 +78,15 @@ abstract class Feature<V> {
     return obj;
   }
 
-  Feature<V> creator() => throw UnimplementedError(
-        'Implement the creator() method in your $runtimeType class. \n'
-        'It should return just new object of your class. \n'
-        'Example: Feature<$V> creator() => $runtimeType()',
-      );
+  Feature<V> creator() {
+    final typeString = runtimeType.toString();
+    throw UnimplementedError(
+      'Implement the creator() method in your $typeString class. \n'
+      'It should return just new object of your class. \n'
+      'Example: \n'
+      '    Feature<$V> creator() => $typeString();\n',
+    );
+  }
 
   late final Type valueType = _type;
   Type get _type {
