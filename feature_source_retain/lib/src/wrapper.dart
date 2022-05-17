@@ -81,6 +81,7 @@ class RetainFeatureSourceWrapper implements TogglingFeatureSourceWrapper {
 
   @override
   FutureOr<void> onReceiveNeedUpdate() async {
+    source.onReceiveNeedUpdate();
     await pull();
   }
 

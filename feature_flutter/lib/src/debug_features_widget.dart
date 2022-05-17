@@ -25,6 +25,7 @@ class _DebugFeaturesWidgetState extends State<DebugFeaturesWidget> {
         child: ListView.builder(
           itemCount: _sources.length,
           shrinkWrap: true,
+          physics: const BouncingScrollPhysics(),
           itemBuilder: (context, index) {
             final source = _sources[index];
             final useWrapper = source is TogglingFeatureSourceWrapper;

@@ -11,7 +11,7 @@ class FeaturesManager {
   late final BehaviorSubject<Map<String, Feature>> _features =
       BehaviorSubject();
 
-  Map<String, Feature> get data => Map.unmodifiable(_features.value);
+  Map<String, Feature> get features => Map.unmodifiable(_features.value);
 
   final Set<FeatureSource> _sources;
   Set<FeatureSource> get sources => Set.unmodifiable(_sources);
@@ -44,7 +44,7 @@ class FeaturesManager {
 
   dynamic value(String key) => getFeature(key)?.dynamicValue;
 
-  Feature? getFeature(String key) => data[key];
+  Feature? getFeature(String key) => features[key];
 
   T? getFeatureByType<T extends Feature>() {
     final feature = getFeature(T.toString());
