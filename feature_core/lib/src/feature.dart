@@ -10,8 +10,11 @@ enum FeatureType {
 }
 
 abstract class FeatureToggle extends Feature<bool> {
-  FeatureToggle({required bool value, bool? enabled})
-      : super(value: value, enabled: enabled ?? value);
+  FeatureToggle({
+    String? key,
+    required bool value,
+    bool? enabled,
+  }) : super(key: key, value: value, enabled: enabled ?? value);
 }
 
 abstract class Feature<V> {
