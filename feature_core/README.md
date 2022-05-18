@@ -2,6 +2,9 @@
 
 Manages feature flags in your application. This is the core library.
 
+[Creating a feature](#creating-a-feature) | [Creating a feature source](#creating-a-feature-source) | [Creating the manager](#creating-the-manager)
+
+[Use with Flutter](#use-with-flutter) | [Use wrappers](#use-wrappers)
 
 ## Additional packages
 
@@ -22,11 +25,11 @@ I hope this list will be expanded in the future.
 
 * There are three main entities: `Feature`, `FeatureSource`, `FeatureManager`.
 
-* `Feature` has a subtype, `FeatureToggle`, which is actually `Feature<bool>`. The entity represents some kind of customization for the application.
+* The entity represents some kind of customization for the application. `Feature` has a subtype, `FeatureToggle`, which is actually `Feature<bool>`.
 
 * `FeatureSource` implements a function that retrieves functions from some repository and handles their updates. It can work without `FeatureManager`.
 
-* The `FeatureManager` combines all feature streams provided by the sources into a single `Map<String, Feature>`. Also provides methods for accessing features. ([*Manager API*](#manager-api))
+* The `FeatureManager` combines all feature streams provided by the sources into a single `Stream<Map<String, Feature>>`. Also provides methods for accessing features. ([*Manager API*](#manager-api))
 
 ## Usage
 
@@ -44,7 +47,19 @@ class UseNewComponent extends FeatureToggle {
 }
 ```
 
-### Creating feature source]
+```dart
+class FirebaseFeature<T extends dynamic> extends Feature<T> {
+  FirebaseFeature({
+    required String key,
+    required T value,
+  }) : super(key: key, value: value);
+
+  @override
+  Feature<T> creator() => FirebaseFeature(key: key, value: value);
+}
+```
+
+### Creating a feature source
 
 To add your own feature source, inherit from `FeatureSource` and implement the `pullFeatures()` method.
 The rest is up to you.
@@ -90,7 +105,7 @@ Once created, you need to `init()` the manager - it will pull all the features f
 
 
 ```dart
-final featureManager = FeaturesManager(
+final featuresManager = FeaturesManager(
   sources: {
     LocalFeatureSource(
       features: [
@@ -101,7 +116,7 @@ final featureManager = FeaturesManager(
     ...
   },
 );
-await featureManager.init();
+await featuresManager.init();
 ```
 
 You can also connect the manager instance to the global scope for easier access. The global entry point `Features` is a proxy for the instance and has the same public api.
@@ -112,9 +127,80 @@ The `connect()` method returns the instance you passed.
 Features.connect(
   instance: FeaturesManager(...),
 );
+
+/// Instance available by
+Features.I
 ```
 
+### Use with Flutter
 
+With the [**feature_flutter**](https://pub.dev/packages/feature_flutter) package you can integrate features into the Flutter application.
+
+The package provides three main widgets: `FeaturesProvider`, `FeatureWidget`, `DebugFeaturesWidget`.
+
+#### `FeaturesProvider`
+
+Passes the manager down the tree.
+
+```dart
+void main() {
+  final FeaturesManager featuresManager = FeaturesManager(...);
+
+  runApp(MaterialApp(
+    home: FeaturesProvider(
+      manager: featuresManager,
+    ),
+    ...
+  ));
+}
+```
+
+#### `FeatureWidget`.
+
+Allows you to show/hide widgets depending on the value of a feature. 
+
+You can use a simplified variant
+
+```dart
+FeatureWidget(
+  feature: featuresManager.getFeature('feature_key'),
+  child: Text(
+    'child when feature: has 'false' value,'
+    'OR is disabled OR not found in manager',
+  ),
+  activatedChild: Text(
+    'child when feature found in manager AND is enabled.'
+  ),
+  visible: true, // default, totally shows/hides widget
+)
+```
+
+Or you can handle feature values more flexibly through the builder.
+
+**Important note**: By default, if the bilder returns nothing, an empty ``SizedBox`` is used.
+
+```dart
+FeatureWidget.builder(
+  feature: featuresManager.getFeatureByType<SomeFeature>(),
+  builder: (BuildContext context, Feature? feature) {
+    if (feature == null) {
+      return // your widget here
+    }
+    if (feature.enabled) {
+      return // your widget here
+    }
+  },
+)
+```
+
+#### `DebugFeaturesWidget`
+
+Just a handy widget which depends on the manager and gives access to enable/disable features.
+
+
+### Use wrappers
+
+Section in progress
 
 ## Manager API
 
