@@ -2,7 +2,6 @@ import 'dart:async';
 
 import 'package:feature_core/feature_core.dart';
 import 'package:firebase_remote_config/firebase_remote_config.dart';
-import 'package:flutter/foundation.dart';
 import 'package:meta/meta.dart';
 
 import 'feature.dart';
