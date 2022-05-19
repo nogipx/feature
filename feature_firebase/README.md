@@ -1,39 +1,36 @@
-<!-- 
-This README describes the package. If you publish this package to pub.dev,
-this README's contents appear on the landing page for your package.
+# feature_source_firebase
 
-For information about how to write a good package README, see the guide for
-[writing package pages](https://dart.dev/guides/libraries/writing-package-pages). 
+## Installation
 
-For general information about developing packages, see the Dart guide for
-[creating packages](https://dart.dev/guides/libraries/create-library-packages)
-and the Flutter guide for
-[developing packages and plugins](https://flutter.dev/developing-packages). 
--->
+To use this library you need to have the following packages:
 
-TODO: Put a short description of the package here that helps potential users
-know whether this package might be useful for them.
-
-## Features
-
-TODO: List what your package can do. Maybe include images, gifs, or videos.
-
-## Getting started
-
-TODO: List prerequisites and provide or point to information on how to
-start using the package.
+```yaml
+dependencies:
+  feature_core: ^1.0.0
+  feature_source_firebase: ^1.0.0
+  firebase_remote_config: ^2.0.0
+```
 
 ## Usage
 
-TODO: Include short and useful examples for package users. Add longer examples
-to `/example` folder. 
+We recommend that you read about the [feature_core](https://pub.dev/packages/feature_core) package before using it.
+
+Compatible with wrappers:
+
+* `TogglingFeatureSourceWrapper` from [feature_core](https://pub.dev/packages/feature_core)
+* `RetainFeatureSourceWrapper` from [feature_source_retain](https://pub.dev/packages/feature_source_retain)
 
 ```dart
-const like = 'sample';
+FeaturesManager(
+  sources: {
+    ...,
+    FirebaseFeatureSource(
+      remoteConfig: FirebaseRemoteConfig.instance, // required
+      minimumFetchInterval: const Duration(hours: 12), // default
+      fetchTimeout: const Duration(minutes: 1) // default
+    ),
+    ...,
+  }
+);
+
 ```
-
-## Additional information
-
-TODO: Tell users more about the package: where to find more information, how to 
-contribute to the package, how to file issues, what response they can expect 
-from the package authors, and more.
