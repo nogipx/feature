@@ -1,6 +1,6 @@
 name: feature_flutter
 description: Flutter components for managing feature-flags.
-version: 1.0.1
+version: 1.0.2
 repository: https://github.com/nogipx/feature
 
 environment:
@@ -11,7 +11,7 @@ dependencies:
   flutter:
     sdk: flutter
   rxdart: ^0.27.3
-  feature_core: ^1.0.1
+  feature_core: ^1.0.2
 #  feature_core:
 #    path: ../feature_core
 

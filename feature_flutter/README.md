@@ -1,39 +1,78 @@
-<!-- 
-This README describes the package. If you publish this package to pub.dev,
-this README's contents appear on the landing page for your package.
+# feature_flutter
 
-For information about how to write a good package README, see the guide for
-[writing package pages](https://dart.dev/guides/libraries/writing-package-pages). 
+**Important note:** We recommend that you read about the [**feature_core**](https://pub.dev/packages/feature_core) package before using it.
 
-For general information about developing packages, see the Dart guide for
-[creating packages](https://dart.dev/guides/libraries/create-library-packages)
-and the Flutter guide for
-[developing packages and plugins](https://flutter.dev/developing-packages). 
--->
+## Installation
 
-TODO: Put a short description of the package here that helps potential users
-know whether this package might be useful for them.
+To use this library you need to have the following packages:
 
-## Features
-
-TODO: List what your package can do. Maybe include images, gifs, or videos.
-
-## Getting started
-
-TODO: List prerequisites and provide or point to information on how to
-start using the package.
+```yaml
+dependencies:
+  feature_core: ^1.0.2
+  feature_flutter: ^1.0.2
+```
 
 ## Usage
 
-TODO: Include short and useful examples for package users. Add longer examples
-to `/example` folder. 
+With the [**feature_flutter**](https://pub.dev/packages/feature_flutter) package you can integrate features into the Flutter application.
+
+The package provides three main widgets: `FeaturesProvider`, `FeatureWidget`, `DebugFeaturesWidget`.
+
+#### `FeaturesProvider`
+
+Passes the manager down the tree.
 
 ```dart
-const like = 'sample';
+void main() {
+  final FeaturesManager featuresManager = FeaturesManager(...);
+
+  runApp(MaterialApp(
+    home: FeaturesProvider(
+      manager: featuresManager,
+    ),
+    ...
+  ));
+}
 ```
 
-## Additional information
+#### `FeatureWidget`
 
-TODO: Tell users more about the package: where to find more information, how to 
-contribute to the package, how to file issues, what response they can expect 
-from the package authors, and more.
+Allows you to show/hide widgets depending on the value of a feature.
+
+You can use a simplified variant
+
+```dart
+FeatureWidget(
+  feature: featuresManager.getFeature('feature_key'),
+  child: Text(
+    'child when feature: has 'false' value,'
+    'OR is disabled OR not found in manager',
+  ),
+  activatedChild: Text(
+    'child when feature found in manager AND is enabled.'
+  ),
+  visible: true, // default, totally shows/hides widget
+)
+```
+
+Or you can handle feature values more flexibly through the builder.
+
+**Important note**: By default, if the bilder returns nothing, an empty ``SizedBox`` is used.
+
+```dart
+FeatureWidget.builder(
+  feature: featuresManager.getFeatureByType<SomeFeature>(),
+  builder: (BuildContext context, Feature? feature) {
+    if (feature == null) {
+      return // your widget here
+    }
+    if (feature.enabled) {
+      return // your widget here
+    }
+  },
+)
+```
+
+#### `DebugFeaturesWidget`
+
+Just a handy widget which depends on the manager and gives access to enable/disable features.

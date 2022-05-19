@@ -1,6 +1,6 @@
 name: feature_core
 description: Core classes and contracts for managing features.
-version: 1.0.1
+version: 1.0.2
 repository: https://github.com/nogipx/feature
 
 environment:
