@@ -29,7 +29,7 @@ class _DebugFeaturesWidgetState extends State<DebugFeaturesWidget> {
           itemBuilder: (context, index) {
             final source = _sources[index];
             final useWrapper = source is TogglingFeatureSourceWrapper;
-            final useMixin = source is TogglingSourceMixin;
+            final useMixin = source is TogglingFeatureSourceMixin;
             final supportToggling = useWrapper || useMixin;
 
             return StreamBuilder<Map<String, Feature>>(
@@ -81,7 +81,7 @@ class _DebugFeaturesWidgetState extends State<DebugFeaturesWidget> {
                               onTap: supportToggling
                                   ? () {
                                       if (useMixin) {
-                                        (source as TogglingSourceMixin)
+                                        (source as TogglingFeatureSourceMixin)
                                             .toggle(feature.key);
                                       }
                                       if (useWrapper) {

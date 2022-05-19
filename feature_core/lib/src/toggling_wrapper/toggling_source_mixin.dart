@@ -1,6 +1,6 @@
 import 'package:feature_core/feature_core.dart';
 
-mixin TogglingSourceMixin on FeatureSource {
+mixin TogglingFeatureSourceMixin on FeatureSource {
   void toggle(String key) {
     final feature = getFeature(key);
     if (feature != null) {

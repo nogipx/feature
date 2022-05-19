@@ -4,7 +4,7 @@ Manages feature flags in your application. This is the core library.
 
 [Creating a feature](#creating-a-feature) | [Creating a feature source](#creating-a-feature-source) | [Creating the manager](#creating-the-manager)
 
-[Use with Flutter](#use-with-flutter) | [Use wrappers](#use-wrappers)
+[Use with Flutter](#use-with-flutter) | [Use wrappers](#use-wrappers) | [Manager API](#manager-api)
 
 ## Additional packages
 
@@ -15,21 +15,21 @@ I hope this list will be expanded in the future.
 
 ### Wrappers
 
-* [**feature_source_retain**](https://pub.dev/packages/feature_flutter) - adds ability to locally save state of features
+* [**feature_source_retain**](https://pub.dev/packages/feature_source_retain) - adds ability to locally save state of features
 
 ### Feature sources
 
-* [**feature_source_firebase**](https://pub.dev/packages/feature_flutter) - implementation for remote firebase config
+* [**feature_source_firebase**](https://pub.dev/packages/feature_source_firebase) - implementation for remote firebase config
 
 ## Concept
 
-* There are three main entities: `Feature`, `FeatureSource`, `FeatureManager`.
+  There are three main entities: `Feature`, `FeatureSource`, `FeatureManager`.
 
-* The entity represents some kind of customization for the application. `Feature` has a subtype, `FeatureToggle`, which is actually `Feature<bool>`.
+* `Feature` represents some kind of customization for the application. It has a subtype, `FeatureToggle`, which is actually `Feature<bool>`.
 
 * `FeatureSource` implements a function that retrieves functions from some repository and handles their updates. It can work without `FeatureManager`.
 
-* The `FeatureManager` combines all feature streams provided by the sources into a single `Stream<Map<String, Feature>>`. Also provides methods for accessing features. ([*Manager API*](#manager-api))
+* `FeatureManager` combines all feature streams provided by the sources into a single `Stream<Map<String, Feature>>`. Also provides methods for accessing features. ([*Manager API*](#manager-api))
 
 ## Usage
 
@@ -155,9 +155,9 @@ void main() {
 }
 ```
 
-#### `FeatureWidget`.
+#### `FeatureWidget`
 
-Allows you to show/hide widgets depending on the value of a feature. 
+Allows you to show/hide widgets depending on the value of a feature.
 
 You can use a simplified variant
 
@@ -197,10 +197,30 @@ FeatureWidget.builder(
 
 Just a handy widget which depends on the manager and gives access to enable/disable features.
 
-
 ### Use wrappers
 
-Section in progress
+The **feature_core** package contains a wrapper that allows you to enable and disable features - `TogglingFeatureSourceWrapper`.
+There is also a mixin that adds the same functionality to your custom function source - `TogglingFeatureSourceMixin`.
+
+#### [See the full list of wrappers here](#wrappers)
+
+```dart
+class CustomFeatureSource extends FeatureSource with TogglingFeatureSourceMixin {}
+```
+
+```dart
+FeaturesManager(
+  sources: {
+    TogglingFeatureSourceWrapper(
+      name: 'Custom name for source',
+      source: LocalFeatureSource(
+        features: [...]
+      )
+    ),
+    ...
+  }
+);
+```
 
 ## Manager API
 
