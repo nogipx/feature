@@ -1,4 +1,4 @@
-name: feature_source_retain
+name: feature_wrapper_retain
 description: Feature source that allows to retain feature state across launches.
 version: 1.0.2
 repository: https://github.com/nogipx/feature

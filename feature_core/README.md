@@ -15,7 +15,7 @@ I hope this list will be expanded in the future.
 
 ### Wrappers
 
-* [**feature_source_retain**](https://pub.dev/packages/feature_source_retain) - adds ability to locally save state of features
+* [**feature_wrapper_retain**](https://pub.dev/packages/feature_wrapper_retain) - adds ability to locally save state of features
 
 ### Feature sources
 
@@ -177,7 +177,7 @@ FeatureWidget(
 
 Or you can handle feature values more flexibly through the builder.
 
-**Important note**: By default, if the bilder returns nothing, an empty ``SizedBox`` is used.
+**Important note**: By default, if the `bilder` returns nothing, an empty `SizedBox` is used.
 
 ```dart
 FeatureWidget.builder(

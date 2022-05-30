@@ -1,4 +1,4 @@
-# feature_source_firebase
+# feature_wrapper_firebase
 
 **Important note:** We recommend that you read about the [**feature_core**](https://pub.dev/packages/feature_core) package before using it.
 
@@ -9,16 +9,15 @@ To use this library you need to have the following packages:
 ```yaml
 dependencies:
   feature_core: &feature_version ^1.1.0
-  feature_source_firebase: *feature_version
-  firebase_remote_config: ^2.0.0
+  feature_wrapper_retain: *feature_version
 ```
 
 ## Usage
 
-Compatible with sources:
+Compatible with wrappers:
 
-* `LocalFeatureSource` from [feature_core](https://pub.dev/packages/feature_core)
-* `FirebaseFeatureSource` from [feature_source_firebase](https://pub.dev/packages/feature_source_firebase)
+* `TogglingFeatureSourceWrapper` from [feature_core](https://pub.dev/packages/feature_core)
+* `RetainFeatureSourceWrapper` from [feature_wrapper_retain](https://pub.dev/packages/feature_wrapper_retain)
 
 ```dart
 FeaturesManager(
