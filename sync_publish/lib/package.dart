@@ -5,9 +5,18 @@ import 'version.dart';
 class Package {
   final Directory directory;
 
-  Package({
+  Package._({
     required this.directory,
   });
+
+  static Package? of(Directory directory) {
+    final pubspec = _getPubspec(directory);
+    if (pubspec != null) {
+      return Package._(directory: directory);
+    } else {
+      return null;
+    }
+  }
 
   String get name {
     final lines = pubspec.readAsLinesSync();
@@ -18,11 +27,12 @@ class Package {
     if (nameLine.isNotEmpty) {
       final name = nameLine.split(':')[1].trim();
       return name;
+    } else {
+      return '';
     }
-    return '';
   }
 
-  File get pubspec {
+  static File? _getPubspec(Directory directory) {
     final file = File('${directory.path}/pubspec.yaml');
     if (file.existsSync()) {
       return file;
@@ -32,7 +42,15 @@ class Package {
         return shortFile;
       }
     }
-    throw Exception('pubspec of "$name" package not found.');
+    return null;
+  }
+
+  File get pubspec {
+    final file = _getPubspec(directory);
+    if (file != null) {
+      return file;
+    }
+    throw Exception('pubspec not found at ${directory.path}.');
   }
 
   File get readme {

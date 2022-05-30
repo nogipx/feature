@@ -15,7 +15,13 @@ Future<void> main(List<String> arguments) async {
   }
 
   final runner = CommandRunner('sync_publish', 'Sync all packages');
-  runner.addCommand(VersioningPackagesCommand(entrypoint));
+  runner.addCommand(VersioningPackagesCommand(
+    entrypoint,
+    onSync: (package) {
+      entrypoint.updateReadmeCoreVersion(
+          package: package, version: package.version);
+    },
+  ));
   runner.addCommand(IncrementVersionsCommand(entrypoint));
   runner.run(arguments).catchError((error) {
     if (error is! UsageException) throw error;

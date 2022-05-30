@@ -10,7 +10,9 @@ class VersioningPackagesCommand extends Command {
   final String description = "Versioning packages";
   final Entrypoint entrypoint;
 
-  VersioningPackagesCommand(this.entrypoint) {
+  final PackageCallback? onSync;
+
+  VersioningPackagesCommand(this.entrypoint, {this.onSync}) {
     argParser.addOption(
       'new',
       abbr: 'n',
@@ -43,7 +45,7 @@ class VersioningPackagesCommand extends Command {
 
     if (args.wasParsed('new')) {
       final version = Version.parse(args.arguments[1]);
-      await synchronize(version);
+      await synchronize(version, onSync);
     } else if (args.wasParsed('max')) {
       /// Get greatest version of all packages
       /// and updates others.
@@ -55,7 +57,7 @@ class VersioningPackagesCommand extends Command {
 
       final maxVersion = packages.maxVersion;
       if (maxVersion != null) {
-        await synchronize(maxVersion);
+        await synchronize(maxVersion, onSync);
       }
     } else if (args.wasParsed('checkSync')) {
       await checkSynced();
@@ -75,7 +77,10 @@ class VersioningPackagesCommand extends Command {
     return isSynced;
   }
 
-  Future<void> synchronize(Version version) async {
+  Future<void> synchronize(
+    Version version, [
+    PackageCallback? callback,
+  ]) async {
     final packages = entrypoint.getPackages().excludeSync;
 
     if (packages.isEmpty || version == _invalidVersion) {
@@ -85,10 +90,7 @@ class VersioningPackagesCommand extends Command {
 
     for (final package in packages) {
       await package.setVersion(version: version);
-      await entrypoint.updateReadmeCoreVersion(
-        package: package,
-        version: version,
-      );
+      callback?.call(package);
     }
   }
 }

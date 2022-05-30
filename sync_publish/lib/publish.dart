@@ -15,11 +15,13 @@ class Entrypoint {
     required Version version,
   }) async {
     final readme = await package.readme.readAsString();
-    final updated = readme.replaceAll(
-      RegExp(r'feature_core: &feature_version (.+)'),
-      'feature_core: &feature_version ^$version',
-    );
-    await package.readme.writeAsString(updated);
+    if (package.name.startsWith('feature')) {
+      final updated = readme.replaceAll(
+        RegExp(r'feature_core: &feature_version (.+)'),
+        'feature_core: &feature_version ^$version',
+      );
+      await package.readme.writeAsString(updated);
+    }
   }
 
   Future<void> publishPackage(Package package) async {}
@@ -29,16 +31,14 @@ class Entrypoint {
         .listSync()
         .whereType<Directory>()
         .where((e) => !e.uri.lastPathSegment.contains('.'));
+
     return featurePackagesPath;
   }
 
   List<Package> getPackages() {
     final packagesDirs = getDirsOfPackages();
-    final packages = packagesDirs.map((e) {
-      return Package(
-        directory: e,
-      );
-    }).toList();
+    final packages =
+        packagesDirs.map((e) => Package.of(e)).whereType<Package>().toList();
 
     return packages.excludeSync;
   }
