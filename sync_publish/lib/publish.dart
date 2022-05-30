@@ -73,4 +73,17 @@ class Entrypoint {
       await package.incrementMajor();
     }
   }
+
+  Future<bool> containsPubspec() async {
+    final file = File('${_workdir.path}/pubspec.yaml');
+    if (file.existsSync()) {
+      return true;
+    } else {
+      final shortFile = File('${_workdir.path}/pubspec.yml');
+      if (shortFile.existsSync()) {
+        return true;
+      }
+      return false;
+    }
+  }
 }

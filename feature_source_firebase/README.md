@@ -8,7 +8,7 @@ To use this library you need to have the following packages:
 
 ```yaml
 dependencies:
-  feature_core: &feature_version ^1.1.0
+  feature_core: &feature_version ^1.0.2
   feature_source_firebase: *feature_version
   firebase_remote_config: ^2.0.0
 ```

@@ -9,7 +9,12 @@ import 'sync_command.dart';
 Future<void> main(List<String> arguments) async {
   final entrypoint = Entrypoint(Directory.current);
 
-  final runner = CommandRunner('sync', 'Sync all packages');
+  if (await entrypoint.containsPubspec()) {
+    print('Current directory contains pubspec. Go to parent directory.');
+    exit(64);
+  }
+
+  final runner = CommandRunner('sync_publish', 'Sync all packages');
   runner.addCommand(VersioningPackagesCommand(entrypoint));
   runner.addCommand(IncrementVersionsCommand(entrypoint));
   runner.run(arguments).catchError((error) {

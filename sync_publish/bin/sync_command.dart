@@ -5,7 +5,7 @@ import 'package:sync_publish/export.dart';
 
 class VersioningPackagesCommand extends Command {
   @override
-  final String name = "version";
+  final String name = "versions";
   @override
   final String description = "Versioning packages";
   final Entrypoint entrypoint;
@@ -83,8 +83,12 @@ class VersioningPackagesCommand extends Command {
       exit(2);
     }
 
-    for (final p in packages) {
-      await p.setVersion(version: version);
+    for (final package in packages) {
+      await package.setVersion(version: version);
+      await entrypoint.updateReadmeCoreVersion(
+        package: package,
+        version: version,
+      );
     }
   }
 }
