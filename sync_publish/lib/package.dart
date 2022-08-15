@@ -1,5 +1,7 @@
 import 'dart:io';
 
+import 'package:process_run/shell.dart';
+
 import 'version.dart';
 
 class Package {
@@ -93,6 +95,54 @@ class Package {
       'version: $version',
     );
     await pubspec.writeAsString(edited);
+  }
+
+  bool containsDependency(String name) {
+    final pubspec = this.pubspec;
+    final text = pubspec.readAsStringSync();
+    final result = text.contains(name);
+    return result;
+  }
+
+  Future<void> startBuildRunner() async {
+    final flutter = whichSync('flutter');
+    if (flutter == null) {
+      print('There is no flutter executable in system.');
+      exit(64);
+    }
+
+    final containsBuildRunner = containsDependency('build_runner:');
+    if (!containsBuildRunner) {
+      print('There is no build_runner dependency in pubspec.');
+      exit(64);
+    }
+
+    final controller = ShellLinesController();
+    print('Start build_runner for "$name" package.\n');
+    controller.stream.listen((event) {
+      print(event);
+    });
+
+    final shell = Shell(
+      stdout: controller.sink,
+      workingDirectory: directory.path,
+    );
+    try {
+      await shell.runExecutableArguments(
+        flutter,
+        'pub get'.split(' '),
+      );
+      await shell.runExecutableArguments(
+        flutter,
+        'pub run build_runner build --delete-conflicting-outputs'.split(' '),
+      );
+    } on ShellException catch (_) {
+      print('Exception while running build: $_');
+    } finally {
+      controller.close();
+      shell.kill();
+      print('End running build_runner.\n');
+    }
   }
 
   @override

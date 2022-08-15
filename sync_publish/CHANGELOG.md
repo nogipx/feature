@@ -1,3 +1,3 @@
-## 1.0.0
+## 0.2.0 - Add running build_runner for package
 
-- Initial version.
+## 0.1.0 - Add changing versions

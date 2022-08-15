@@ -2,12 +2,30 @@ import 'package:feature_core/feature_core.dart';
 import 'package:feature_flutter/src/bouncing_button.dart';
 import 'package:flutter/material.dart';
 
+typedef WidgetFeatureCallback = Widget Function(
+    Feature feature, bool canToggle);
+
 class DebugFeaturesWidget extends StatefulWidget {
   final FeaturesManager manager;
+  final BorderRadius? featureBorderRadius;
+  final Color? featureActivatedColor;
+  final Color? featureDeactivatedColor;
+  final TextStyle? sourceTitleStyle;
+  final TextStyle? featureTitleStyle;
+
+  final WidgetFeatureCallback? featureNameBuilder;
+  final WidgetFeatureCallback? featureValueBuilder;
 
   const DebugFeaturesWidget({
     required this.manager,
     Key? key,
+    this.featureBorderRadius,
+    this.featureActivatedColor,
+    this.featureDeactivatedColor,
+    this.featureNameBuilder,
+    this.sourceTitleStyle,
+    this.featureTitleStyle,
+    this.featureValueBuilder,
   }) : super(key: key);
 
   @override
@@ -29,7 +47,16 @@ class _DebugFeaturesWidgetState extends State<DebugFeaturesWidget> {
           itemBuilder: (context, index) {
             final source = _sources[index];
 
-            return _SourceListItem(source: source);
+            return _SourceListItem(
+              source: source,
+              sourceTitleStyle: widget.sourceTitleStyle,
+              featureBorderRadius: widget.featureBorderRadius,
+              featureActivatedColor: widget.featureActivatedColor,
+              featureDeactivatedColor: widget.featureDeactivatedColor,
+              featureTitleStyle: widget.featureTitleStyle,
+              featureNameBuilder: widget.featureNameBuilder,
+              featureValueBuilder: widget.featureValueBuilder,
+            );
           },
         ),
       ),
@@ -39,9 +66,25 @@ class _DebugFeaturesWidgetState extends State<DebugFeaturesWidget> {
 
 class _SourceListItem extends StatefulWidget {
   final FeatureSource source;
+  final TextStyle? sourceTitleStyle;
+
+  final BorderRadius? featureBorderRadius;
+  final Color? featureActivatedColor;
+  final Color? featureDeactivatedColor;
+  final TextStyle? featureTitleStyle;
+
+  final WidgetFeatureCallback? featureNameBuilder;
+  final WidgetFeatureCallback? featureValueBuilder;
 
   const _SourceListItem({
     required this.source,
+    this.sourceTitleStyle,
+    this.featureBorderRadius,
+    this.featureActivatedColor,
+    this.featureDeactivatedColor,
+    this.featureTitleStyle,
+    this.featureNameBuilder,
+    this.featureValueBuilder,
     Key? key,
   }) : super(key: key);
 
@@ -50,7 +93,9 @@ class _SourceListItem extends StatefulWidget {
 }
 
 class _SourceListItemState extends State<_SourceListItem> {
-  late final useTogglingWrapper = widget.source is TogglingFeatureSourceWrapper;
+  late final useTogglingWrapper =
+      widget.source is TogglingFeatureSourceWrapper &&
+          (widget.source as TogglingFeatureSourceWrapper).enableToggling;
 
   late final useTogglingMixin = widget.source is TogglingFeatureSourceMixin;
 
@@ -74,10 +119,11 @@ class _SourceListItemState extends State<_SourceListItem> {
                 widget.source.name.isNotEmpty
                     ? widget.source.name
                     : widget.source.runtimeType.toString(),
-                style: Theme.of(context)
-                    .textTheme
-                    .headline6
-                    ?.copyWith(color: Colors.grey),
+                style: widget.sourceTitleStyle ??
+                    Theme.of(context)
+                        .textTheme
+                        .headline6
+                        ?.copyWith(color: Colors.grey),
               ),
               const SizedBox(height: 12),
               if (data.isEmpty)
@@ -90,8 +136,8 @@ class _SourceListItemState extends State<_SourceListItem> {
                         .bodyText2
                         ?.copyWith(color: Colors.grey),
                   ),
-                ),
-              if (data.isNotEmpty)
+                )
+              else
                 ListView.separated(
                   itemCount: data.length,
                   primary: false,
@@ -104,6 +150,12 @@ class _SourceListItemState extends State<_SourceListItem> {
                     final feature = data[index];
                     return _FeatureListItem(
                       feature: feature,
+                      featureBorderRadius: widget.featureBorderRadius,
+                      featureActivatedColor: widget.featureActivatedColor,
+                      featureDeactivatedColor: widget.featureDeactivatedColor,
+                      featureTitleStyle: widget.featureTitleStyle,
+                      featureNameBuilder: widget.featureNameBuilder,
+                      featureValueBuilder: widget.featureValueBuilder,
                       onToggle: supportToggling
                           ? () {
                               if (useTogglingMixin) {
@@ -130,11 +182,24 @@ class _SourceListItemState extends State<_SourceListItem> {
 class _FeatureListItem extends StatelessWidget {
   final Feature feature;
   final VoidCallback? onToggle;
+  final BorderRadius? featureBorderRadius;
+  final TextStyle? featureTitleStyle;
+  final Color? featureActivatedColor;
+  final Color? featureDeactivatedColor;
+
+  final WidgetFeatureCallback? featureNameBuilder;
+  final WidgetFeatureCallback? featureValueBuilder;
 
   const _FeatureListItem({
     required this.feature,
     this.onToggle,
     Key? key,
+    this.featureBorderRadius,
+    this.featureActivatedColor,
+    this.featureDeactivatedColor,
+    this.featureTitleStyle,
+    this.featureNameBuilder,
+    this.featureValueBuilder,
   }) : super(key: key);
 
   @override
@@ -145,13 +210,13 @@ class _FeatureListItem extends StatelessWidget {
       enableBounce: supportToggling,
       onTap: supportToggling ? onToggle : null,
       child: Material(
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: featureBorderRadius ?? BorderRadius.circular(16),
         elevation: 1,
         color: supportToggling
             ? feature.enabled
-                ? Colors.green.shade100
-                : Colors.red.shade100
-            : Colors.white,
+                ? featureActivatedColor ?? Colors.green.shade100
+                : featureDeactivatedColor ?? Colors.red.shade100
+            : featureDeactivatedColor ?? Colors.white,
         child: Container(
           padding: const EdgeInsets.symmetric(
             horizontal: 16,
@@ -159,25 +224,29 @@ class _FeatureListItem extends StatelessWidget {
           ),
           constraints: const BoxConstraints(
             minHeight: 40,
+            maxHeight: 100,
           ),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Expanded(
-                flex: 3,
-                child: Text(
-                  feature.key,
-                  style: Theme.of(context).textTheme.bodyText1,
-                ),
+                flex: 5,
+                child: featureNameBuilder?.call(feature, supportToggling) ??
+                    Text(
+                      feature.key,
+                      style: featureTitleStyle ??
+                          Theme.of(context).textTheme.bodyText1,
+                    ),
               ),
               const SizedBox(width: 8),
               Expanded(
                 flex: 2,
-                child: Text(
-                  feature.value.toString(),
-                  textAlign: TextAlign.center,
-                  style: Theme.of(context).textTheme.bodyText2,
-                ),
+                child: featureValueBuilder?.call(feature, supportToggling) ??
+                    Text(
+                      feature.value.toString(),
+                      textAlign: TextAlign.center,
+                      style: Theme.of(context).textTheme.bodyText2,
+                    ),
               ),
             ],
           ),

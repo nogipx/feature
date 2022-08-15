@@ -12,6 +12,11 @@ class RetainFeatureSourceWrapper implements TogglingFeatureSourceWrapper {
   final SharedPreferences preferences;
   final String tag;
 
+  final bool enableRetain;
+
+  @override
+  final bool enableToggling;
+
   @override
   String name;
 
@@ -20,6 +25,8 @@ class RetainFeatureSourceWrapper implements TogglingFeatureSourceWrapper {
     required this.preferences,
     required this.tag,
     this.name = '',
+    this.enableRetain = true,
+    this.enableToggling = true,
   });
 
   @override
@@ -61,7 +68,7 @@ class RetainFeatureSourceWrapper implements TogglingFeatureSourceWrapper {
   void toggle(String key) {
     source.toggle(key);
     final updatedFeature = getFeature(key);
-    if (updatedFeature != null) {
+    if (updatedFeature != null && enableRetain) {
       _persistFeature(updatedFeature);
     }
   }
@@ -88,6 +95,12 @@ class RetainFeatureSourceWrapper implements TogglingFeatureSourceWrapper {
   @override
   FutureOr<Iterable<Feature>> pullFeatures() async {
     final pulled = await source.pullFeatures();
+
+    if (!enableRetain) {
+      _clearPersistent(pulled);
+      return pulled;
+    }
+
     final features = Map.fromEntries(pulled.map((e) => MapEntry(e.key, e)));
     final savedKeys = preferences.getKeys().where((e) => e.endsWith(_key));
 
@@ -144,6 +157,13 @@ class RetainFeatureSourceWrapper implements TogglingFeatureSourceWrapper {
     return features.values;
   }
 
+  Future<void> _clearPersistent(Iterable<Feature> features) async {
+    for (final feature in features) {
+      final internalKey = _serializeFeatureKey(feature.key);
+      await preferences.remove(internalKey);
+    }
+  }
+
   Future<void> _persistFeature(Feature feature) async {
     final internalKey = _serializeFeatureKey(feature.key);
     final data = _serializeFeature(feature);
@@ -177,4 +197,11 @@ class RetainFeatureSourceWrapper implements TogglingFeatureSourceWrapper {
     final json = jsonDecode(data) as Map<String, dynamic>;
     return json;
   }
+
+  @override
+  operator ==(Object other) =>
+      other is RetainFeatureSourceWrapper && tag == other.tag;
+
+  @override
+  int get hashCode => Object.hashAll([tag]);
 }

@@ -14,7 +14,8 @@ abstract class FeatureToggle extends Feature<bool> {
     String? key,
     required bool value,
     bool? enabled,
-  }) : super(key: key, value: value, enabled: enabled ?? value);
+    String? name,
+  }) : super(key: key, value: value, enabled: enabled ?? value, name: name);
 }
 
 abstract class Feature<V> {
@@ -29,13 +30,18 @@ abstract class Feature<V> {
 
   bool get isToggle => V == bool;
 
+  String? _name;
+  String get name => _name ?? runtimeType.toString();
+
   Feature({
     String? key,
     required V value,
     bool? enabled,
+    String? name,
   }) : _value = value {
     _enabled = value is bool ? (enabled ?? value) : true;
     _key = key ?? runtimeType.toString();
+    _name = name ?? runtimeType.toString();
   }
 
   @override

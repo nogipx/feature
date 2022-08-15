@@ -23,6 +23,8 @@ abstract class Features {
     await I.init();
   }
 
+  static Stream<Feature>? featureStream(String key) => I.featureStream(key);
+
   static bool check(String key, dynamic value) =>
       I.value(key) == value || I.getFeature(key)?.value == value;
 

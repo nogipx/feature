@@ -1,6 +1,6 @@
 name: sync_publish
 description: Sync related packages versions.
-version: 0.1.0
+version: 0.2.0
 repository: https://github.com/nogipx/feature
 
 executables:
@@ -12,6 +12,8 @@ environment:
 dependencies:
   args: ^2.3.1
   path: ^1.8.0
+  process_run: ^0.12.3+2
+  collection: ^1.16.0
 
 dev_dependencies:
   lints: ^2.0.0

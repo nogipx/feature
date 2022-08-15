@@ -4,6 +4,7 @@ import 'package:feature_core/feature_core.dart';
 
 class TogglingFeatureSourceWrapper implements FeatureSource {
   final FeatureSource source;
+  final bool enableToggling;
 
   @override
   String name;
@@ -11,6 +12,7 @@ class TogglingFeatureSourceWrapper implements FeatureSource {
   TogglingFeatureSourceWrapper({
     required this.source,
     this.name = '',
+    this.enableToggling = true,
   });
 
   @override
@@ -56,21 +58,21 @@ class TogglingFeatureSourceWrapper implements FeatureSource {
 
   void toggle(String key) {
     final feature = getFeature(key);
-    if (feature != null) {
+    if (feature != null && enableToggling) {
       setEnable(key, !feature.enabled);
     }
   }
 
   void toggleByType<T extends Feature>() {
     final feature = getFeatureByType<T>();
-    if (feature != null) {
+    if (feature != null && enableToggling) {
       setEnable(feature.key, !feature.enabled);
     }
   }
 
   void setEnable(String key, bool value) {
     final feature = getFeature(key);
-    if (feature != null) {
+    if (feature != null && enableToggling) {
       final newFeature = feature.copyWith(enabled: value);
       updateFeature(newFeature);
     }
