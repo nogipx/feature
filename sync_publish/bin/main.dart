@@ -1,11 +1,11 @@
 import 'dart:io';
 
 import 'package:args/command_runner.dart';
-import 'package:sync_publish/export.dart';
+import 'package:sync_publish/sync_publish.dart';
 
-import 'build_runner_command.dart';
-import 'increment_command.dart';
-import 'sync_command.dart';
+import 'commands/runner/build_runner_command.dart';
+import 'commands/sync/increment_command.dart';
+import 'commands/sync/sync_command.dart';
 
 Future<void> main(List<String> arguments) async {
   final entrypoint = Entrypoint(Directory.current);

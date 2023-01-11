@@ -1,7 +1,7 @@
 import 'dart:io';
 
 import 'package:args/command_runner.dart';
-import 'package:sync_publish/export.dart';
+import 'package:sync_publish/sync_publish.dart';
 
 class VersioningPackagesCommand extends Command {
   @override
@@ -14,27 +14,25 @@ class VersioningPackagesCommand extends Command {
 
   VersioningPackagesCommand(this.entrypoint, {this.onSync}) {
     argParser.addOption(
-      'new',
-      abbr: 'n',
+      'syncNew',
       help: 'Sync all packages to particular version.',
       valueHelp: '1.2.3',
     );
     argParser.addFlag(
-      'max',
-      abbr: 'm',
+      'syncLatest',
       help: 'Sync all packages to greatest version.',
+      negatable: false,
+    );
+    argParser.addFlag(
+      'syncCheck',
+      abbr: 'c',
+      help: 'Checks are all packages in sync and prints their common version.',
       negatable: false,
     );
     argParser.addFlag(
       'list',
       abbr: 'l',
       help: 'List all packages versions.',
-      negatable: false,
-    );
-    argParser.addFlag(
-      'checkSync',
-      abbr: 'c',
-      help: 'Checks are all packages in sync and prints their common version.',
       negatable: false,
     );
   }

@@ -1,4 +1,4 @@
-import 'export.dart';
+import '_index.dart';
 import 'package.dart';
 import 'version.dart';
 

@@ -1,5 +1,6 @@
 import 'package:args/command_runner.dart';
-import 'package:sync_publish/export.dart';
+import 'package:sync_publish/sync_publish.dart';
+
 import 'package:collection/collection.dart';
 
 class StartBuildRunnerCommand extends Command {

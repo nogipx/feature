@@ -1,5 +1,5 @@
 import 'package:args/command_runner.dart';
-import 'package:sync_publish/export.dart';
+import 'package:sync_publish/sync_publish.dart';
 
 class IncrementVersionsCommand extends Command {
   @override
@@ -17,13 +17,11 @@ class IncrementVersionsCommand extends Command {
     );
     argParser.addFlag(
       'minor',
-      abbr: 'm',
       help: 'Increments minor versions of all packages.',
       negatable: false,
     );
     argParser.addFlag(
       'patch',
-      abbr: 'p',
       help: 'Increments patch versions of all packages.',
       negatable: false,
     );
@@ -40,5 +38,7 @@ class IncrementVersionsCommand extends Command {
     } else if (args.wasParsed('patch')) {
       await entrypoint.incrementAllPatch();
     }
+
+    printUsage();
   }
 }
