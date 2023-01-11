@@ -35,6 +35,10 @@ class Entrypoint {
     return featurePackagesPath;
   }
 
+  Package? get currentPackage {
+    return Package.of(_workdir);
+  }
+
   List<Package> getPackages() {
     final packagesDirs = getDirsOfPackages();
     final packages =

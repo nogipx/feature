@@ -1,8 +1,8 @@
 import 'dart:io';
 
+import 'package:process_run/cmd_run.dart';
 import 'package:process_run/shell.dart';
-
-import 'version.dart';
+import 'package:sync_publish/sync_publish.dart';
 
 class Package {
   final Directory directory;
@@ -105,42 +105,26 @@ class Package {
   }
 
   Future<void> startBuildRunner() async {
-    final flutter = whichSync('flutter');
-    if (flutter == null) {
-      print('There is no flutter executable in system.');
-      exit(64);
-    }
-
     final containsBuildRunner = containsDependency('build_runner:');
     if (!containsBuildRunner) {
       print('There is no build_runner dependency in pubspec.');
       exit(64);
     }
 
-    final controller = ShellLinesController();
-    print('Start build_runner for "$name" package.\n');
-    controller.stream.listen((event) {
-      print(event);
-    });
+    final shell = FlutterShell(workingDirectory: directory).open();
+    shell.eventStream.listen(print);
 
-    final shell = Shell(
-      stdout: controller.sink,
-      workingDirectory: directory.path,
-    );
+    print('Start build_runner for "$name" package.\n');
+
     try {
-      await shell.runExecutableArguments(
-        flutter,
-        'pub get'.split(' '),
-      );
-      await shell.runExecutableArguments(
-        flutter,
-        'pub run build_runner build --delete-conflicting-outputs'.split(' '),
+      await shell.run('pub get');
+      await shell.run(
+        'pub run build_runner build --delete-conflicting-outputs',
       );
     } on ShellException catch (_) {
       print('Exception while running build: $_');
     } finally {
-      controller.close();
-      shell.kill();
+      shell.close();
       print('End running build_runner.\n');
     }
   }

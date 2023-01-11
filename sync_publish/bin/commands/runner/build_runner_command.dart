@@ -42,6 +42,8 @@ class StartBuildRunnerCommand extends Command {
       for (final package in packages) {
         await package.startBuildRunner();
       }
+      final current = entrypoint.currentPackage;
+      current?.startBuildRunner();
     }
   }
 }

@@ -13,7 +13,7 @@ abstract class EnvProperty<T> {
 }
 
 class StringEnvProperty extends EnvProperty<String> {
-  const StringEnvProperty(super.key, {super.defaultValue});
+  const StringEnvProperty(super.key, {super.defaultValue, super.required});
 
   @override
   String? get value =>
@@ -21,7 +21,7 @@ class StringEnvProperty extends EnvProperty<String> {
 }
 
 class BoolEnvProperty extends EnvProperty<bool> {
-  const BoolEnvProperty(super.key, {super.defaultValue});
+  const BoolEnvProperty(super.key, {super.defaultValue, super.required});
 
   @override
   bool? get value =>
