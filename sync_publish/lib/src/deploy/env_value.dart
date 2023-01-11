@@ -14,8 +14,11 @@ class EnvProperty {
     this.loadFromEnv = true,
   });
 
-  String? get fromEnvironment =>
-      String.fromEnvironment(key, defaultValue: defaultValue ?? '');
+  /// Watch issue: https://github.com/flutter/flutter/issues/55870
+  /// .fromEnvironment() work only with const keyword.
+  ///
+  // String? get fromEnvironment =>
+  //     String.fromEnvironment(key, defaultValue: defaultValue ?? '');
 
   String get dartDefine => '--dart-define=$key=$value';
 
