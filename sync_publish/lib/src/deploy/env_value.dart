@@ -1,29 +1,42 @@
-abstract class EnvProperty<T> {
+class EnvProperty {
   final String key;
-  final T? defaultValue;
+  final String? value;
+  final String? defaultValue;
+
   final bool required;
+  final bool loadFromEnv;
 
   const EnvProperty(
     this.key, {
+    this.value,
     this.defaultValue,
     this.required = false,
+    this.loadFromEnv = true,
   });
 
-  T? get value;
-}
-
-class StringEnvProperty extends EnvProperty<String> {
-  const StringEnvProperty(super.key, {super.defaultValue, super.required});
-
-  @override
-  String? get value =>
+  String? get fromEnvironment =>
       String.fromEnvironment(key, defaultValue: defaultValue ?? '');
-}
 
-class BoolEnvProperty extends EnvProperty<bool> {
-  const BoolEnvProperty(super.key, {super.defaultValue, super.required});
+  String get dartDefine => '--dart-define=$key=$value';
 
   @override
-  bool? get value =>
-      bool.fromEnvironment(key, defaultValue: defaultValue ?? false);
+  operator ==(Object other) => other is EnvProperty && other.key == key;
+
+  @override
+  int get hashCode => Object.hashAll([key]);
+
+  EnvProperty copyWith({
+    String? value,
+    String? defaultValue,
+    bool? required,
+    bool? loadFromEnv,
+  }) {
+    return EnvProperty(
+      key,
+      value: value ?? this.value,
+      defaultValue: defaultValue ?? this.defaultValue,
+      required: required ?? this.required,
+      loadFromEnv: loadFromEnv ?? this.loadFromEnv,
+    );
+  }
 }
