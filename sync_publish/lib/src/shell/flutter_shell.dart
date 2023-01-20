@@ -57,6 +57,16 @@ class FlutterShell {
     );
   }
 
+  Future<void> runWithoutFlutter(String command, String options) async {
+    if (!isOpen) {
+      open();
+    }
+    await _shell!.runExecutableArguments(
+      command,
+      options.split(' '),
+    );
+  }
+
   void close() async {
     _shell?.kill();
     _shell = null;
