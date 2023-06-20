@@ -1,9 +1,10 @@
 import 'package:collection/collection.dart';
-import 'package:feature_core/src/new/usecases/pull_features.dart';
 import 'package:logging/logging.dart';
 
+import '../models/_index.dart';
+import '../usecases/_index.dart';
+import '../utils/_index.dart';
 import '_index.dart';
-import 'change_notifier.dart';
 
 class FeaturesProviderUpdater extends ChangeNotifier {
   void notifyNeedUpdate(String key) {

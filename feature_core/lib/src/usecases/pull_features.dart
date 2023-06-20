@@ -1,6 +1,7 @@
 import 'package:data_manage/data_manage.dart';
 
-import '../_index.dart';
+import '../manager/_index.dart';
+import '../models/_index.dart';
 
 class PullFeaturesUseCase extends UseCaseAsync<List<FeatureAbstract>> {
   final Iterable<FeaturesProvider> providers;

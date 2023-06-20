@@ -1,4 +1,4 @@
-import '_index.dart';
+import '../models/_index.dart';
 
 class FeaturesContainer {
   final Map<String, FeatureAbstract> _features;
