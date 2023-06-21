@@ -2,16 +2,6 @@
 
 **Important note:** We recommend that you read about the [**feature_core**](https://pub.dev/packages/feature_core) package before using it.
 
-## Installation
-
-To use this library you need to have the following packages:
-
-```yaml
-dependencies:
-  feature_core: ^1.1.0
-  feature_flutter: ^1.1.0
-```
-
 ## Usage
 
 With the [**feature_flutter**](https://pub.dev/packages/feature_flutter) package you can integrate features into the Flutter application.

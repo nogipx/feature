@@ -56,7 +56,7 @@ class FeatureListItem extends StatelessWidget {
                     Text(
                       feature.key,
                       style: featureTitleStyle ??
-                          Theme.of(context).textTheme.bodyText1,
+                          Theme.of(context).textTheme.bodyLarge,
                     ),
               ),
               const SizedBox(width: 8),
@@ -66,7 +66,7 @@ class FeatureListItem extends StatelessWidget {
                     Text(
                       feature.value.toString(),
                       textAlign: TextAlign.center,
-                      style: Theme.of(context).textTheme.bodyText2,
+                      style: Theme.of(context).textTheme.bodyMedium,
                     ),
               ),
             ],
