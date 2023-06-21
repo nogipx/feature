@@ -1,9 +1,9 @@
-import 'dart:developer' as dev;
-
 import 'package:logging/logging.dart';
 
 import '../manager/_index.dart';
 import '../models/_index.dart';
+
+final _logger = Logger('PullFeaturesUseCase');
 
 class PullFeaturesUseCase {
   final Iterable<FeaturesProvider> providers;
@@ -16,12 +16,10 @@ class PullFeaturesUseCase {
         try {
           return await provider.pullFeatures();
         } catch (e, stackTrace) {
-          dev.log(
-            'Cannot pull features from "${provider.key}" provider.',
-            name: 'PullFeaturesUseCase',
-            error: e,
-            stackTrace: stackTrace,
-            level: Level.SEVERE.value,
+          _logger.severe(
+            'Cannot pull features from "${provider.key}" provider. $e',
+            e,
+            stackTrace,
           );
           return <FeatureAbstract>[];
         }
