@@ -1,18 +1,12 @@
-import 'dart:async';
-
 import 'package:feature_core/feature_core.dart';
-import 'package:feature_flutter/src/feature_provider.dart';
 import 'package:flutter/material.dart';
 
-typedef FeatureBuilderCallback<T> = Widget Function(
-  BuildContext context,
-  Feature<T>? feature,
-);
+import '_index.dart';
 
 enum _Type { child, builder }
 
-class FeatureWidget extends StatefulWidget {
-  final Feature? feature;
+class FeatureWidget extends StatelessWidget {
+  final String? featureKey;
   final FeatureBuilderCallback? builder;
   final Widget? activatedChild;
 
@@ -25,7 +19,7 @@ class FeatureWidget extends StatefulWidget {
   final _Type type;
 
   const FeatureWidget._({
-    required this.feature,
+    required this.featureKey,
     required this.type,
     this.builder,
     this.activatedChild,
@@ -35,13 +29,13 @@ class FeatureWidget extends StatefulWidget {
   }) : super(key: key);
 
   factory FeatureWidget.builder({
-    Feature? feature,
+    String? featureKey,
     required FeatureBuilderCallback builder,
     bool visible = true,
     Key? key,
   }) {
     return FeatureWidget._(
-      feature: feature,
+      featureKey: featureKey,
       builder: builder,
       visible: visible,
       key: key,
@@ -50,14 +44,14 @@ class FeatureWidget extends StatefulWidget {
   }
 
   factory FeatureWidget({
-    Feature? feature,
+    String? featureKey,
     Widget? child,
     Widget? activatedChild,
     bool visible = true,
     Key? key,
   }) {
     return FeatureWidget._(
-      feature: feature,
+      featureKey: featureKey,
       child: child,
       activatedChild: activatedChild,
       visible: visible,
@@ -67,56 +61,25 @@ class FeatureWidget extends StatefulWidget {
   }
 
   @override
-  State<FeatureWidget> createState() => _FeatureWidgetState();
-}
-
-class _FeatureWidgetState extends State<FeatureWidget> {
-  late final ValueNotifier<Feature?> _feature;
-  late final StreamSubscription? _updateSubscription;
-
-  @override
-  void initState() {
-    super.initState();
-    _feature = ValueNotifier(widget.feature);
-
-    if (_feature.value != null) {
-      _updateSubscription = FeaturesProvider.of(context)
-          ?.manager
-          .featureStream(_feature.value!.key)
-          ?.listen((feature) {
-        _feature.value = feature;
-      });
-    }
-  }
-
-  @override
-  void dispose() {
-    _updateSubscription?.cancel();
-    _feature.dispose();
-    super.dispose();
-  }
-
-  @override
   Widget build(BuildContext context) {
-    return ValueListenableBuilder<Feature?>(
-      valueListenable: _feature,
-      builder: (context, feature, _) {
+    return StreamBuilder<MappedFeatures>(
+      stream: FeaturesInherited.of(context)?.manager.stream,
+      builder: (context, snapshot) {
+        final feature = snapshot.data?[featureKey];
         const empty = SizedBox();
 
-        if (!widget.visible) {
+        if (!visible) {
           return empty;
         } else if (feature == null) {
-          return widget.type == _Type.builder
-              ? widget.builder?.call(context, feature) ?? empty
-              : widget.child ?? empty;
+          return type == _Type.builder
+              ? builder?.call(context, feature) ?? empty
+              : child ?? empty;
         }
 
-        if (widget.type == _Type.builder) {
-          return widget.builder?.call(context, feature) ?? empty;
+        if (type == _Type.builder) {
+          return builder?.call(context, feature) ?? empty;
         } else {
-          return feature.enabled
-              ? widget.activatedChild ?? empty
-              : widget.child ?? empty;
+          return activatedChild ?? empty;
         }
       },
     );

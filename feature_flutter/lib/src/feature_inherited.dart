@@ -1,17 +1,17 @@
 import 'package:feature_core/feature_core.dart';
 import 'package:flutter/cupertino.dart';
 
-class FeaturesProvider extends InheritedWidget {
-  final FeaturesManager manager;
+class FeaturesInherited extends InheritedWidget {
+  final FeaturesManagerStreamed manager;
 
-  const FeaturesProvider({
+  const FeaturesInherited({
     required this.manager,
     required Widget child,
     Key? key,
   }) : super(child: child, key: key);
 
-  static FeaturesProvider? of(BuildContext context) =>
-      context.findAncestorWidgetOfExactType<FeaturesProvider>();
+  static FeaturesInherited? of(BuildContext context) =>
+      context.findAncestorWidgetOfExactType<FeaturesInherited>();
 
   @override
   bool updateShouldNotify(covariant InheritedWidget oldWidget) {
