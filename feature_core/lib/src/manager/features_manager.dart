@@ -1,6 +1,7 @@
 import 'package:collection/collection.dart';
 import 'package:logging/logging.dart';
 import 'package:meta/meta.dart';
+import 'package:rxdart/rxdart.dart';
 
 import '../models/_index.dart';
 import '../usecases/_index.dart';
@@ -66,7 +67,7 @@ class FeaturesManager {
   Future<void> forceReloadFeatures() async {
     final features = await PullFeaturesUseCase(_providers).run();
     _featuresContainer.replaceAllFeatures(features);
-    onUpdate(_featuresContainer.features);
+    _onUpdate(_featuresContainer.features);
   }
 
   Future<void> _updateProviderByKey(String providerKey) async {
@@ -85,11 +86,11 @@ class FeaturesManager {
         }
       }
     }
-    onUpdate(_featuresContainer.features);
+    _onUpdate(_featuresContainer.features);
   }
 
   @protected
-  void onUpdate(MappedFeatures features) {
+  void _onUpdate(MappedFeatures features) {
     _updateListener?.call(features);
   }
 
@@ -97,5 +98,28 @@ class FeaturesManager {
   void dispose() {
     _updater.target?.removeListener(_providerPullRequestListener);
     _featuresContainer.replaceAllFeatures([]);
+  }
+}
+
+class FeaturesManagerStreamed extends FeaturesManager {
+  late final BehaviorSubject<MappedFeatures> _controller;
+
+  Stream<MappedFeatures> get stream => _controller.stream;
+
+  FeaturesManagerStreamed({
+    List<FeaturesProvider> providers = const [],
+  }) : super(providers: providers) {
+    _controller = BehaviorSubject.seeded({});
+  }
+
+  @override
+  void _onUpdate(MappedFeatures features) {
+    _controller.sink.add(features);
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+    _controller.close();
   }
 }
