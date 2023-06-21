@@ -103,7 +103,6 @@ class ChangeNotifier implements Listenable {
   ///
   /// As [ChangedNotifier] is used as mixin, it does not have constructor,
   /// so we use [addListener] to dispatch the event.
-  bool _creationDispatched = false;
 
   /// Used by subclasses to assert that the [ChangeNotifier] has not yet been
   /// disposed.
@@ -342,7 +341,7 @@ class ChangeNotifier implements Listenable {
     for (int i = 0; i < end; i++) {
       try {
         _listeners[i]?.call(key);
-      } catch (exception, stack) {
+      } catch (exception) {
         throw Exception(exception.toString());
       }
     }

@@ -8,8 +8,8 @@ To use this library you need to have the following packages:
 
 ```yaml
 dependencies:
-  feature_core: &feature_version ^1.0.2
-  feature_flutter: *feature_version
+  feature_core: ^1.1.0
+  feature_flutter: ^1.1.0
 ```
 
 ## Usage

@@ -1,17 +1,15 @@
 import 'dart:developer' as dev;
 
-import 'package:data_manage/data_manage.dart';
 import 'package:logging/logging.dart';
 
 import '../manager/_index.dart';
 import '../models/_index.dart';
 
-class PullFeaturesUseCase extends UseCaseAsync<List<FeatureAbstract>> {
+class PullFeaturesUseCase {
   final Iterable<FeaturesProvider> providers;
 
   const PullFeaturesUseCase(this.providers);
 
-  @override
   Future<List<FeatureAbstract>> run() async {
     final newFeaturesPool = await Future.wait(
       providers.map((provider) async {
