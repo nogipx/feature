@@ -22,8 +22,8 @@ void main() {
         ],
       );
 
-      providerWithUpdater.notifyNeedUpdate();
-      providerWithoutUpdater.notifyNeedUpdate();
+      providerWithUpdater.requestPullFeatures();
+      providerWithoutUpdater.requestPullFeatures();
 
       expect(providerWithUpdater.count, equals(1));
       expect(providerWithoutUpdater.count, equals(0));

@@ -12,8 +12,8 @@ dependencies:
   firebase_remote_config: ^4.2.3
 
 dependency_overrides:
-  feature_core:
-    path: ../feature_core
+#  feature_core:
+#    path: ../feature_core
 
 dev_dependencies:
   lints: ^1.0.0

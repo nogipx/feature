@@ -23,7 +23,7 @@ class FirebaseFeaturesProvider extends FeaturesProvider {
       ))
       ..fetchAndActivate();
     _remoteConfig.onConfigUpdated.listen((event) {
-      notifyNeedUpdate();
+      requestPullFeatures();
     });
   }
 

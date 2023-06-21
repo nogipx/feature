@@ -26,7 +26,7 @@ abstract class FeaturesProvider {
     this.needUpdater = false,
   });
 
-  void notifyNeedUpdate() => _updater?.notifyNeedUpdate(key);
+  void requestPullFeatures() => _updater?.notifyNeedUpdate(key);
 
   Future<Iterable<FeatureAbstract>> pullFeatures();
 }
