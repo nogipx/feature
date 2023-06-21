@@ -25,15 +25,13 @@ void main() {
       providerWithUpdater.notifyNeedUpdate();
       providerWithoutUpdater.notifyNeedUpdate();
 
-      expect(sut.providers.first.needUpdater, isTrue);
-      expect(sut.providers.last.needUpdater, isFalse);
       expect(providerWithUpdater.count, equals(1));
       expect(providerWithoutUpdater.count, equals(0));
 
       await Future.delayed(const Duration(milliseconds: 1));
 
       expect(
-        sut.getFeature(providerWithUpdater.testFeatureKey)?.dynamicValue,
+        sut.getFeature(providerWithUpdater.testFeatureKey)?.value,
         equals(1),
       );
       expect(

@@ -1,7 +1,10 @@
 import '../models/_index.dart';
 
+typedef MappedFeatures = Map<String, FeatureAbstract>;
+
 class FeaturesContainer {
-  final Map<String, FeatureAbstract> _features;
+  final MappedFeatures _features;
+  MappedFeatures get features => Map.unmodifiable(_features);
 
   FeaturesContainer() : _features = {};
 

@@ -1,5 +1,6 @@
 import 'package:collection/collection.dart';
 import 'package:logging/logging.dart';
+import 'package:meta/meta.dart';
 
 import '../models/_index.dart';
 import '../usecases/_index.dart';
@@ -32,31 +33,50 @@ abstract class FeaturesProvider {
 class FeaturesManager {
   final _logger = Logger('FeaturesManager');
 
-  final List<FeaturesProvider> providers;
+  final List<FeaturesProvider> _providers;
   final FeaturesContainer _featuresContainer;
-  final updater = WeakReference(FeaturesProviderUpdater());
+  final _updater = WeakReference(FeaturesProviderUpdater());
+
+  final void Function(MappedFeatures)? _updateListener;
 
   FeaturesManager({
-    this.providers = const [],
-  }) : _featuresContainer = FeaturesContainer() {
+    List<FeaturesProvider> providers = const [],
+    void Function(MappedFeatures)? updateListener,
+  })  : _providers = providers,
+        _updateListener = updateListener,
+        _featuresContainer = FeaturesContainer() {
     for (final provider in providers) {
       if (provider.needUpdater) {
-        provider._updater = updater.target;
+        provider._updater = _updater.target;
       }
     }
-    updater.target?.addListener((key) async {
-      _updateProviderByKey(key);
-    });
+    _updater.target?.addListener(_providerPullRequestListener);
   }
+
+  void _providerPullRequestListener(String providerKey) async {
+    _updateProviderByKey(providerKey);
+  }
+
+  Map<String, FeatureAbstract> get features => _featuresContainer.features;
 
   FeatureAbstract? getFeature(String key) {
     return _featuresContainer.getFeature(key);
   }
 
+  Future<void> forceReloadFeatures() async {
+    final features = await PullFeaturesUseCase(_providers).run();
+    _featuresContainer.replaceAllFeatures(features);
+    onUpdate(_featuresContainer.features);
+  }
+
   Future<void> _updateProviderByKey(String providerKey) async {
-    final provider = providers.firstWhereOrNull((e) => e.key == providerKey);
+    if (providerKey.isEmpty) {
+      return;
+    }
+
+    final provider = _providers.firstWhereOrNull((e) => e.key == providerKey);
     if (provider != null) {
-      final features = await provider.pullFeatures();
+      final features = await PullFeaturesUseCase([provider]).run();
       for (final newFeature in features) {
         try {
           _featuresContainer.replaceFeature(newFeature);
@@ -65,10 +85,17 @@ class FeaturesManager {
         }
       }
     }
+    onUpdate(_featuresContainer.features);
   }
 
-  Future<void> forceReloadFeatures() async {
-    final features = await PullFeaturesUseCase(providers).run();
-    _featuresContainer.replaceAllFeatures(features);
+  @protected
+  void onUpdate(MappedFeatures features) {
+    _updateListener?.call(features);
+  }
+
+  @mustCallSuper
+  void dispose() {
+    _updater.target?.removeListener(_providerPullRequestListener);
+    _featuresContainer.replaceAllFeatures([]);
   }
 }
