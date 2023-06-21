@@ -1,6 +1,6 @@
 name: feature_source_firebase
 description: Feature source integration with Firebase Remote Config.
-version: 1.0.2
+version: 1.1.0
 repository: https://github.com/nogipx/feature
 
 environment:
@@ -8,10 +8,12 @@ environment:
 
 dependencies:
   meta: ^1.7.0
-  feature_core: ^1.0.2
-  firebase_remote_config: ^2.0.0
-#  feature_core:
-#    path: ../feature_core
+  feature_core: ^1.1.0
+  firebase_remote_config: ^4.2.3
+
+dependency_overrides:
+  feature_core:
+    path: ../feature_core
 
 dev_dependencies:
   lints: ^1.0.0
