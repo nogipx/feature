@@ -29,6 +29,7 @@ class FirebaseFeaturesProvider extends FeaturesProvider {
 
   @override
   Future<Iterable<FeatureAbstract>> pullFeatures() async {
+    await _remoteConfig.fetchAndActivate();
     final features = _remoteConfig.getAll().entries.map((e) {
       final raw = FeatureFirebase(
         key: e.key,
