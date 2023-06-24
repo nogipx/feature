@@ -8,8 +8,8 @@ import '../usecases/_index.dart';
 import '../utils/_index.dart';
 import '_index.dart';
 
-class FeaturesProviderUpdater extends ChangeNotifier {
-  void notifyNeedUpdate(String key) {
+class _FeaturesProviderUpdater extends ChangeNotifier {
+  void _notifyNeedUpdate(String key) {
     notifyListeners(key);
   }
 }
@@ -18,7 +18,7 @@ abstract class FeaturesProvider {
   final String name;
   final String key;
   final bool needUpdater;
-  FeaturesProviderUpdater? _updater;
+  _FeaturesProviderUpdater? _updater;
 
   FeaturesProvider({
     required this.name,
@@ -26,7 +26,7 @@ abstract class FeaturesProvider {
     this.needUpdater = false,
   });
 
-  void requestPullFeatures() => _updater?.notifyNeedUpdate(key);
+  void requestPullFeatures() => _updater?._notifyNeedUpdate(key);
 
   Future<Iterable<FeatureAbstract>> pullFeatures();
 }
@@ -36,7 +36,7 @@ class FeaturesManager {
 
   final List<FeaturesProvider> _providers;
   final FeaturesContainer _featuresContainer;
-  final _updater = WeakReference(FeaturesProviderUpdater());
+  final _updater = WeakReference(_FeaturesProviderUpdater());
 
   final void Function(MappedFeatures)? _updateListener;
 
