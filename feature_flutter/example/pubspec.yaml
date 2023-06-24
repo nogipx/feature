@@ -1,0 +1,31 @@
+name: feature_flutter_example
+description: A new Flutter project.
+publish_to: 'none' 
+
+version: 1.0.0+1
+
+environment:
+  sdk: '>=3.0.1 <4.0.0'
+
+dependencies:
+  flutter:
+    sdk: flutter
+  cupertino_icons: ^1.0.2
+  get_it: ^7.6.0
+
+  feature_core: ^1.2.0
+  feature_flutter: ^1.2.0
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^2.0.0
+
+dependency_overrides:
+  feature_core:
+    path: ../../feature_core
+  feature_flutter:
+    path: ..
+
+flutter:
+  uses-material-design: true
