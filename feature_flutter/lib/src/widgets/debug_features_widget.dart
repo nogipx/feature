@@ -1,7 +1,7 @@
 import 'package:feature_core/feature_core.dart';
 import 'package:flutter/material.dart';
 
-import '_index.dart';
+import '../_index.dart';
 
 class DebugFeaturesWidget extends StatefulWidget {
   final FeaturesManagerStreamed manager;
