@@ -1,3 +1,4 @@
+import 'package:feature_flutter_example/_features_screen.dart';
 import 'package:flutter/material.dart';
 
 class MainScreen extends StatefulWidget {
@@ -24,6 +25,16 @@ class _MainScreenState extends State<MainScreen> {
       appBar: AppBar(
         backgroundColor: Theme.of(context).colorScheme.inversePrimary,
         title: Text(widget.title),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.settings),
+            onPressed: () {
+              Navigator.of(context).push(MaterialPageRoute(builder: (context) {
+                return const FeaturesScreen();
+              }));
+            },
+          )
+        ],
       ),
       body: Center(
         child: Column(

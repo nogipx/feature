@@ -1,6 +1,7 @@
 import 'package:feature_core/feature_core.dart';
 import 'package:feature_flutter_example/_main_screen.dart';
 import 'package:flutter/material.dart';
+import 'package:get_it/get_it.dart';
 
 class TestFeaturesProvider extends FeaturesProvider {
   TestFeaturesProvider()
@@ -18,12 +19,18 @@ class TestFeaturesProvider extends FeaturesProvider {
   }
 }
 
-void main() {
+Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  final features = FeaturesManager(providers: [
-    TestFeaturesProvider(),
-  ]);
+  final features = FeaturesManagerStreamed(
+    providers: [
+      TestFeaturesProvider(),
+    ],
+  );
+
+  await features.forceReloadFeatures();
+
+  GetIt.instance.registerSingleton(features);
 
   runApp(const MyApp());
 }

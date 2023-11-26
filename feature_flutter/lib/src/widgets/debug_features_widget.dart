@@ -5,25 +5,13 @@ import '../_index.dart';
 
 class DebugFeaturesWidget extends StatefulWidget {
   final FeaturesManagerStreamed manager;
-  final BorderRadius? featureBorderRadius;
-  final Color? featureActivatedColor;
-  final Color? featureDeactivatedColor;
-  final TextStyle? sourceTitleStyle;
-  final TextStyle? featureTitleStyle;
 
-  final WidgetFeatureCallback? featureNameBuilder;
-  final WidgetFeatureCallback? featureValueBuilder;
+  final Widget Function(BuildContext context, int index)? featureBuilder;
 
   const DebugFeaturesWidget({
     required this.manager,
+    this.featureBuilder,
     Key? key,
-    this.featureBorderRadius,
-    this.featureActivatedColor,
-    this.featureDeactivatedColor,
-    this.featureNameBuilder,
-    this.sourceTitleStyle,
-    this.featureTitleStyle,
-    this.featureValueBuilder,
   }) : super(key: key);
 
   @override
@@ -45,21 +33,18 @@ class _DebugFeaturesWidgetState extends State<DebugFeaturesWidget> {
               itemCount: features.length,
               shrinkWrap: true,
               padding: const EdgeInsets.symmetric(vertical: 16),
-              separatorBuilder: (_, __) => const SizedBox(height: 8),
+              separatorBuilder: (_, __) => const SizedBox(height: 12),
               physics: const BouncingScrollPhysics(),
-              itemBuilder: (context, index) {
-                final feature = features[index];
+              itemBuilder: widget.featureBuilder ??
+                  (context, index) {
+                    final feature = features[index];
 
-                return FeatureListItem(
-                  feature: feature,
-                  featureBorderRadius: widget.featureBorderRadius,
-                  featureActivatedColor: widget.featureActivatedColor,
-                  featureDeactivatedColor: widget.featureDeactivatedColor,
-                  featureTitleStyle: widget.featureTitleStyle,
-                  featureNameBuilder: widget.featureNameBuilder,
-                  featureValueBuilder: widget.featureValueBuilder,
-                );
-              },
+                    return FeatureDefaultListItem(
+                      feature: feature,
+                      onTap: () {},
+                      // extra: widget.manager.getExtra,
+                    );
+                  },
             );
           },
         ),

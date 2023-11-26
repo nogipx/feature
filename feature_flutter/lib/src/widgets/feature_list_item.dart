@@ -3,76 +3,112 @@ import 'package:flutter/material.dart';
 
 import '../_index.dart';
 
-class FeatureListItem extends StatelessWidget {
+class FeatureExtra {
+  final String providerName;
+  final FeatureAbstract? featureOverride;
+
+  const FeatureExtra({
+    this.providerName = '',
+    this.featureOverride,
+  });
+}
+
+class FeatureDefaultListItem extends StatelessWidget {
   final FeatureAbstract feature;
-  final VoidCallback? onToggle;
+  final VoidCallback? onTap;
+  final FeatureExtra? extra;
 
-  final BorderRadius? featureBorderRadius;
-  final TextStyle? featureTitleStyle;
-  final Color? featureActivatedColor;
-  final Color? featureDeactivatedColor;
-
-  final WidgetFeatureCallback? featureNameBuilder;
-  final WidgetFeatureCallback? featureValueBuilder;
-
-  const FeatureListItem({
-    required this.feature,
-    this.onToggle,
+  const FeatureDefaultListItem({
     Key? key,
-    this.featureBorderRadius,
-    this.featureActivatedColor,
-    this.featureDeactivatedColor,
-    this.featureTitleStyle,
-    this.featureNameBuilder,
-    this.featureValueBuilder,
+    required this.feature,
+    this.onTap,
+    this.extra,
   }) : super(key: key);
+
+  static const _radius = BorderRadius.all(Radius.circular(12));
+  static const _containerDecoration = BoxDecoration(
+    color: Colors.white,
+    borderRadius: _radius,
+    boxShadow: [
+      BoxShadow(
+        color: Color(0xB3C8C8C8),
+        blurRadius: 2,
+        offset: Offset(0, 1),
+      ),
+    ],
+  );
 
   @override
   Widget build(BuildContext context) {
-    final supportToggling = onToggle != null;
+    assert(() {
+      if (extra?.featureOverride != null &&
+          extra?.featureOverride?.key != feature.key) {
+        return false;
+      }
+      return true;
+    }());
 
     return BouncingWidget(
-      enableBounce: supportToggling,
-      onTap: supportToggling ? onToggle : null,
-      child: Material(
-        borderRadius: featureBorderRadius ?? BorderRadius.circular(16),
-        elevation: 1,
-        color: featureDeactivatedColor ?? Colors.white,
-        child: Container(
-          padding: const EdgeInsets.symmetric(
-            horizontal: 16,
-            vertical: 8,
-          ),
-          constraints: const BoxConstraints(
-            minHeight: 40,
-            maxHeight: 100,
-          ),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Expanded(
-                flex: 5,
-                child: featureNameBuilder?.call(feature, supportToggling) ??
-                    Text(
-                      feature.key,
-                      style: featureTitleStyle ??
-                          Theme.of(context).textTheme.bodyLarge,
-                    ),
-              ),
-              const SizedBox(width: 8),
-              Expanded(
-                flex: 2,
-                child: featureValueBuilder?.call(feature, supportToggling) ??
-                    Text(
-                      feature.value.toString(),
-                      textAlign: TextAlign.center,
-                      style: Theme.of(context).textTheme.bodyMedium,
-                    ),
-              ),
-            ],
-          ),
+      enableBounce: onTap != null,
+      onTap: onTap,
+      child: Container(
+        padding: const EdgeInsets.symmetric(
+          horizontal: 12,
+          vertical: 8,
         ),
+        decoration: _containerDecoration,
+        child: _buildContent(),
       ),
+    );
+  }
+
+  Widget _buildContent() {
+    return Builder(builder: (context) {
+      return Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Text(
+            '${feature.key}',
+            style: Theme.of(context).textTheme.titleMedium,
+          ),
+          const SizedBox(height: 4),
+          Wrap(
+            spacing: 8,
+            runSpacing: 8,
+            children: [
+              _buildInfo(value: feature.value.runtimeType.toString()),
+              _buildInfo(key: 'Value', value: feature.value.toString()),
+            ],
+          )
+        ],
+      );
+    });
+  }
+
+  Widget _buildInfo({
+    String? key,
+    required String value,
+  }) {
+    return Builder(
+      builder: (context) {
+        return Container(
+          padding: const EdgeInsets.symmetric(
+            vertical: 4,
+            horizontal: 8,
+          ),
+          decoration: BoxDecoration(
+            borderRadius: _radius,
+            border: Border.all(color: Colors.grey.shade400),
+          ),
+          child: Text(
+            key != null ? '$key: $value' : value,
+            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                  color: Colors.grey.shade700,
+                ),
+          ),
+        );
+      },
     );
   }
 }
