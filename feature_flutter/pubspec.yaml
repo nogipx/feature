@@ -9,13 +9,13 @@ environment:
   flutter: ">=2.0.0"
 
 dependencies:
-  feature_core: ^1.2.0
+  feature_core: ^2.0.0
   flutter:
     sdk: flutter
 
-dependency_overrides:
-  feature_core:
-    path: ../feature_core
+#dependency_overrides:
+#  feature_core:
+#    path: ../feature_core
 
 dev_dependencies:
   flutter_test:

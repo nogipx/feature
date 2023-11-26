@@ -8,12 +8,12 @@ environment:
   sdk: '>=3.0.0 <4.0.0'
 
 dependencies:
-  feature_core: ^1.2.0
+  feature_core: ^2.0.0
   firebase_remote_config: ^4.3.5
 
-dependency_overrides:
-  feature_core:
-    path: ../feature_core
+#dependency_overrides:
+#  feature_core:
+#    path: ../feature_core
 
 dev_dependencies:
   lints: ^1.0.0
