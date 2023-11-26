@@ -71,16 +71,16 @@ class _MainScreenState extends State<MainScreen> {
               borderRadius: const BorderRadius.all(
                 Radius.circular(16),
               ),
-              child: FeatureWidget(
-                // This function will switch the red/green color because
-                // the function widget reacts to the bool value as switches
-                featureKey: 'dynamicBool',
-                activatedChild: const SizedBox(
-                  height: 40,
-                  width: 80,
-                  child: ColoredBox(color: Colors.green),
+              child: SizedBox(
+                height: 40,
+                width: 80,
+                child: FeatureWidget(
+                  // This function will switch the red/green color because
+                  // the function widget reacts to the bool value as switches
+                  featureKey: 'dynamicBool',
+                  activatedChild: const ColoredBox(color: Colors.green),
+                  child: const ColoredBox(color: Colors.red),
                 ),
-                // child: const ColoredBox(color: Colors.red),
               ),
             ),
             FeatureWidget(
