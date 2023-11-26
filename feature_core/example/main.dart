@@ -16,7 +16,7 @@ class SomeDependency {
   }
 }
 
-class TestFeatureProvider extends FeaturesProvider {
+final class TestFeatureProvider extends FeaturesProvider {
   final SomeDependency dependency;
 
   TestFeatureProvider({
@@ -24,11 +24,14 @@ class TestFeatureProvider extends FeaturesProvider {
   }) : super(
           name: 'Test provider',
           key: 'test_provider',
-          needUpdater: true,
+          enableUpdater: true,
         ) {
-    Timer.periodic(const Duration(seconds: 4), (timer) {
-      requestPullFeatures();
-    });
+    Timer.periodic(
+      const Duration(seconds: 4),
+      (timer) {
+        requestPullFeatures();
+      },
+    );
   }
 
   @override

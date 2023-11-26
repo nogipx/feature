@@ -22,7 +22,7 @@ typedef VoidCallback = void Function(String key);
 /// Many classes in the Flutter API use or implement these interfaces. The
 /// following subclasses are especially relevant:
 ///
-///  * [ChangeNotifier], which can be subclassed or mixed in to create objects
+///  * [FeatureProviderChangeNotifier], which can be subclassed or mixed in to create objects
 ///    that implement the [Listenable] interface.
 ///
 ///  * [ValueNotifier], which implements the [ValueListenable] interface with
@@ -80,8 +80,8 @@ abstract class Listenable {
 ///
 /// See also:
 ///
-///  * [ValueNotifier], which is a [ChangeNotifier] that wraps a single value.
-class ChangeNotifier implements Listenable {
+///  * [ValueNotifier], which is a [FeatureProviderChangeNotifier] that wraps a single value.
+class FeatureProviderChangeNotifier implements Listenable {
   int _count = 0;
   // The _listeners is intentionally set to a fixed-length _GrowableList instead
   // of const [].
@@ -104,7 +104,7 @@ class ChangeNotifier implements Listenable {
   /// As [ChangedNotifier] is used as mixin, it does not have constructor,
   /// so we use [addListener] to dispatch the event.
 
-  /// Used by subclasses to assert that the [ChangeNotifier] has not yet been
+  /// Used by subclasses to assert that the [FeatureProviderChangeNotifier] has not yet been
   /// disposed.
   ///
   /// {@tool snippet}
@@ -123,7 +123,7 @@ class ChangeNotifier implements Listenable {
   // This is static and not an instance method because too many people try to
   // implement ChangeNotifier instead of extending it (and so it is too breaking
   // to add a method, especially for debug).
-  static bool debugAssertNotDisposed(ChangeNotifier notifier) {
+  static bool debugAssertNotDisposed(FeatureProviderChangeNotifier notifier) {
     assert(() {
       if (notifier._debugDisposed) {
         throw Exception(
@@ -170,7 +170,7 @@ class ChangeNotifier implements Listenable {
   /// (e.g. in response to a notification), it will still be called again. If,
   /// on the other hand, it is removed as many times as it was registered, then
   /// it will no longer be called. This odd behavior is the result of the
-  /// [ChangeNotifier] not being able to determine which listener is being
+  /// [FeatureProviderChangeNotifier] not being able to determine which listener is being
   /// removed, since they are identical, therefore it will conservatively still
   /// call all the listeners when it knows that any are still registered.
   ///
@@ -185,7 +185,7 @@ class ChangeNotifier implements Listenable {
   ///    the list of closures that are notified when the object changes.
   @override
   void addListener(VoidCallback listener) {
-    assert(ChangeNotifier.debugAssertNotDisposed(this));
+    assert(FeatureProviderChangeNotifier.debugAssertNotDisposed(this));
     if (_count == _listeners.length) {
       if (_count == 0) {
         _listeners = List<VoidCallback?>.filled(1, null);
@@ -285,7 +285,7 @@ class ChangeNotifier implements Listenable {
   /// listeners or not immediately before disposal.
   @mustCallSuper
   void dispose() {
-    assert(ChangeNotifier.debugAssertNotDisposed(this));
+    assert(FeatureProviderChangeNotifier.debugAssertNotDisposed(this));
     assert(
       _notificationCallStackDepth == 0,
       'The "dispose()" method on $this was called during the call to '
@@ -319,7 +319,7 @@ class ChangeNotifier implements Listenable {
   @visibleForTesting
   @pragma('vm:notify-debugger-on-exception')
   void notifyListeners(String key) {
-    assert(ChangeNotifier.debugAssertNotDisposed(this));
+    assert(FeatureProviderChangeNotifier.debugAssertNotDisposed(this));
     if (_count == 0) {
       return;
     }

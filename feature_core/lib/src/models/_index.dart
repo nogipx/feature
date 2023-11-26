@@ -1,2 +1,2 @@
 export 'abstract_feature.dart';
-export 'features.dart';
+export 'generic_feature.dart';

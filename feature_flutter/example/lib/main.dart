@@ -22,7 +22,7 @@ class TestFeaturesProvider extends FeaturesProvider {
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  final features = FeaturesManagerStreamed(
+  final features = FeaturesManager(
     providers: [
       TestFeaturesProvider(),
     ],

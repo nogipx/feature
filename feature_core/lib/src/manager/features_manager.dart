@@ -1,73 +1,58 @@
 import 'package:collection/collection.dart';
 import 'package:logging/logging.dart';
 import 'package:meta/meta.dart';
-import 'package:rxdart/rxdart.dart';
 
 import '../models/_index.dart';
 import '../usecases/_index.dart';
 import '../utils/_index.dart';
 import '_index.dart';
 
-class _FeaturesProviderUpdater extends ChangeNotifier {
-  void _notifyNeedUpdate(String key) {
-    notifyListeners(key);
+base class FeaturesManager implements IFeaturesManager {
+  FeaturesManager({
+    List<FeaturesProvider>? providers,
+    void Function(MappedFeatures)? updateListener,
+    IFeaturesContainer? featuresContainer,
+    Logger? logger,
+  })  : _providers = providers ?? [],
+        _updateListener = updateListener,
+        _featuresContainer = featuresContainer ?? FeaturesContainer(),
+        _logger = logger ?? Logger('FeaturesManager') {
+    for (final provider in _providers) {
+      if (provider._needUpdater) {
+        provider._updater = _updater;
+      }
+    }
+    _updater.addListener(_updateProviderByKey);
   }
-}
 
-abstract class FeaturesProvider {
-  final String name;
-  final String key;
-  final bool needUpdater;
-  _FeaturesProviderUpdater? _updater;
-
-  FeaturesProvider({
-    required this.name,
-    required this.key,
-    this.needUpdater = false,
-  });
-
-  void requestPullFeatures() => _updater?._notifyNeedUpdate(key);
-
-  Future<Iterable<FeatureAbstract>> pullFeatures();
-}
-
-class FeaturesManager {
-  final _logger = Logger('FeaturesManager');
+  final Logger _logger;
 
   final List<FeaturesProvider> _providers;
-  final FeaturesContainer _featuresContainer;
-  final _updater = WeakReference(_FeaturesProviderUpdater());
+  final IFeaturesContainer _featuresContainer;
+  final _updater = _FeaturesProviderUpdater();
 
   final void Function(MappedFeatures)? _updateListener;
 
-  FeaturesManager({
-    List<FeaturesProvider> providers = const [],
-    void Function(MappedFeatures)? updateListener,
-  })  : _providers = providers,
-        _updateListener = updateListener,
-        _featuresContainer = FeaturesContainer() {
-    for (final provider in providers) {
-      if (provider.needUpdater) {
-        provider._updater = _updater.target;
-      }
-    }
-    _updater.target?.addListener(_providerPullRequestListener);
-  }
+  @override
+  MappedFeatures get features => _featuresContainer.features;
 
-  void _providerPullRequestListener(String providerKey) async {
-    _updateProviderByKey(providerKey);
-  }
-
-  Map<String, FeatureAbstract> get features => _featuresContainer.features;
-
+  @override
   FeatureAbstract? getFeature(String key) {
     return _featuresContainer.getFeature(key);
   }
 
+  @override
   Future<void> forceReloadFeatures() async {
     final features = await PullFeaturesUseCase(_providers).run();
     _featuresContainer.replaceAllFeatures(features);
     _onUpdate(_featuresContainer.features);
+  }
+
+  @override
+  @mustCallSuper
+  void dispose() {
+    _updater.removeListener(_updateProviderByKey);
+    _featuresContainer.replaceAllFeatures([]);
   }
 
   Future<void> _updateProviderByKey(String providerKey) async {
@@ -80,9 +65,10 @@ class FeaturesManager {
       final features = await PullFeaturesUseCase([provider]).run();
       for (final newFeature in features) {
         try {
-          _featuresContainer.replaceFeature(newFeature);
-        } catch (e) {
-          _logger.warning(e.toString());
+          _featuresContainer.addOrReplaceFeature(newFeature);
+        } catch (error) {
+          print(error.toString());
+          _logger.warning(error.toString());
         }
       }
     }
@@ -93,33 +79,30 @@ class FeaturesManager {
   void _onUpdate(MappedFeatures features) {
     _updateListener?.call(features);
   }
+}
 
-  @mustCallSuper
-  void dispose() {
-    _updater.target?.removeListener(_providerPullRequestListener);
-    _featuresContainer.replaceAllFeatures([]);
+base class FeaturesProvider {
+  final String name;
+  final String key;
+  final bool _needUpdater;
+  _FeaturesProviderUpdater? _updater;
+
+  FeaturesProvider({
+    required this.name,
+    required this.key,
+    bool? enableUpdater,
+  }) : _needUpdater = enableUpdater ?? true;
+
+  void requestPullFeatures() => _updater?._notifyNeedUpdate(key);
+
+  @mustBeOverridden
+  Future<Iterable<FeatureAbstract>> pullFeatures() async {
+    return [];
   }
 }
 
-class FeaturesManagerStreamed extends FeaturesManager {
-  late final BehaviorSubject<MappedFeatures> _controller;
-
-  Stream<MappedFeatures> get stream => _controller.stream;
-
-  FeaturesManagerStreamed({
-    List<FeaturesProvider> providers = const [],
-  }) : super(providers: providers) {
-    _controller = BehaviorSubject.seeded({});
-  }
-
-  @override
-  void _onUpdate(MappedFeatures features) {
-    _controller.sink.add(features);
-  }
-
-  @override
-  void dispose() {
-    super.dispose();
-    _controller.close();
+class _FeaturesProviderUpdater extends FeatureProviderChangeNotifier {
+  void _notifyNeedUpdate(String key) {
+    notifyListeners(key);
   }
 }

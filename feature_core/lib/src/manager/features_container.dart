@@ -1,17 +1,20 @@
 import '../models/_index.dart';
+import '_index.dart';
 
-typedef MappedFeatures = Map<String, FeatureAbstract>;
-
-class FeaturesContainer {
-  final MappedFeatures _features;
-  MappedFeatures get features => Map.unmodifiable(_features);
-
+base class FeaturesContainer implements IFeaturesContainer {
   FeaturesContainer() : _features = {};
 
+  @override
+  MappedFeatures get features => Map.unmodifiable(_features);
+  final MappedFeatures _features;
+
+  @override
   FeatureAbstract? getFeature(String key) => _features[key];
 
+  @override
   bool containsFeature(String key) => _features.containsKey(key);
 
+  @override
   void replaceAllFeatures(Iterable<FeatureAbstract> newFeatures) {
     _guardAllFeaturesKeysUnique(newFeatures);
     _features.clear();
@@ -20,15 +23,17 @@ class FeaturesContainer {
     }
   }
 
-  void replaceFeature(FeatureAbstract newFeature) {
+  @override
+  void addOrReplaceFeature(FeatureAbstract newFeature) {
     _features[newFeature.key] = newFeature;
   }
 
+  @override
   void updateFeature(FeatureAbstract newFeature) {
     if (!containsFeature(newFeature.key)) {
       throw Exception('Feature key "${newFeature.key}" not found.');
     }
-    replaceFeature(newFeature);
+    addOrReplaceFeature(newFeature);
   }
 
   void _guardAllFeaturesKeysUnique(Iterable<FeatureAbstract> features) {

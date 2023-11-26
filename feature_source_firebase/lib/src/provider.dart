@@ -1,7 +1,7 @@
 import 'package:feature_source_firebase/feature_source_firebase.dart';
 import 'package:firebase_remote_config/firebase_remote_config.dart';
 
-class FirebaseFeaturesProvider extends FeaturesProvider {
+final class FirebaseFeaturesProvider extends FeaturesProvider {
   final FirebaseRemoteConfig _remoteConfig;
 
   FirebaseFeaturesProvider({
@@ -14,7 +14,7 @@ class FirebaseFeaturesProvider extends FeaturesProvider {
         super(
           name: name,
           key: key,
-          needUpdater: true,
+          enableUpdater: true,
         ) {
     _remoteConfig
       ..setConfigSettings(RemoteConfigSettings(

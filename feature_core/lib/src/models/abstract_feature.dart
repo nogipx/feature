@@ -1,6 +1,8 @@
 import 'dart:convert';
 
-abstract class FeatureAbstract<V> {
+import 'package:meta/meta.dart';
+
+abstract base class FeatureAbstract<V> {
   final String key;
   final V _value;
 
@@ -19,6 +21,7 @@ abstract class FeatureAbstract<V> {
   @override
   int get hashCode => Object.hash(key, _value);
 
+  @mustBeOverridden
   FeatureAbstract<V> copyWith({required V value}) => throw UnimplementedError();
 
   @override
