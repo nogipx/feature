@@ -3,6 +3,8 @@ import '../models/_index.dart';
 abstract interface class IFeaturesManager {
   MappedFeatures get features;
 
+  Stream<MappedFeatures> get featuresStream;
+
   FeatureAbstract? getFeature(String key);
 
   Future<void> forceReloadFeatures();

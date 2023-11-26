@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import '../_index.dart';
 
 class DebugFeaturesWidget extends StatefulWidget {
-  final FeaturesManagerStreamed manager;
+  final IFeaturesManager manager;
 
   final Widget Function(BuildContext context, int index)? featureBuilder;
 
@@ -25,9 +25,10 @@ class _DebugFeaturesWidgetState extends State<DebugFeaturesWidget> {
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 16),
         child: StreamBuilder<MappedFeatures>(
-          stream: widget.manager.stream,
+          stream: widget.manager.featuresStream,
           builder: (context, snapshot) {
-            final features = snapshot.data?.values.toList() ?? [];
+            final features = snapshot.data?.values.toList() ??
+                widget.manager.features.values.toList();
 
             return ListView.separated(
               itemCount: features.length,

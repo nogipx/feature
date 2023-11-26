@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:collection/collection.dart';
 import 'package:logging/logging.dart';
 import 'package:meta/meta.dart';
@@ -16,7 +18,8 @@ base class FeaturesManager implements IFeaturesManager {
   })  : _providers = providers ?? [],
         _updateListener = updateListener,
         _featuresContainer = featuresContainer ?? FeaturesContainer(),
-        _logger = logger ?? Logger('FeaturesManager') {
+        _logger = logger ?? Logger('FeaturesManager'),
+        _streamController = StreamController() {
     for (final provider in _providers) {
       if (provider._needUpdater) {
         provider._updater = _updater;
@@ -33,8 +36,13 @@ base class FeaturesManager implements IFeaturesManager {
 
   final void Function(MappedFeatures)? _updateListener;
 
+  final StreamController<MappedFeatures> _streamController;
+
   @override
   MappedFeatures get features => _featuresContainer.features;
+
+  @override
+  late final featuresStream = _streamController.stream.asBroadcastStream();
 
   @override
   FeatureAbstract? getFeature(String key) {
@@ -51,6 +59,7 @@ base class FeaturesManager implements IFeaturesManager {
   @override
   @mustCallSuper
   void dispose() {
+    _streamController.close();
     _updater.removeListener(_updateProviderByKey);
     _featuresContainer.replaceAllFeatures([]);
   }
@@ -78,20 +87,22 @@ base class FeaturesManager implements IFeaturesManager {
   @protected
   void _onUpdate(MappedFeatures features) {
     _updateListener?.call(features);
+    _streamController.sink.add(features);
   }
 }
 
 base class FeaturesProvider {
-  final String name;
   final String key;
+  final String name;
   final bool _needUpdater;
   _FeaturesProviderUpdater? _updater;
 
   FeaturesProvider({
-    required this.name,
     required this.key,
+    String? name,
     bool? enableUpdater,
-  }) : _needUpdater = enableUpdater ?? true;
+  })  : _needUpdater = enableUpdater ?? true,
+        name = name ?? key;
 
   void requestPullFeatures() => _updater?._notifyNeedUpdate(key);
 

@@ -3,7 +3,6 @@ import 'package:feature_flutter/feature_flutter.dart';
 import 'package:flutter/material.dart';
 
 import '../_index.dart';
-import '_index.dart';
 
 enum _Type { child, builder }
 
@@ -64,10 +63,14 @@ class FeatureWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final manager = FeaturesInherited.of(context)?.manager;
+
     return StreamBuilder<MappedFeatures>(
-      stream: FeaturesInherited.of(context)?.manager.stream,
+      stream: manager?.featuresStream,
       builder: (context, snapshot) {
-        final feature = snapshot.data?[featureKey];
+        final feature =
+            snapshot.data?[featureKey] ?? manager?.features[featureKey];
+
         const empty = SizedBox();
 
         if (!visible) {

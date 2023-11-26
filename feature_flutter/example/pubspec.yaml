@@ -2,7 +2,7 @@ name: feature_flutter_example
 description: A new Flutter project.
 publish_to: 'none' 
 
-version: 1.0.0+1
+version: 2.0.0
 
 environment:
   sdk: '>=3.0.1 <4.0.0'

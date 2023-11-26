@@ -1,14 +1,13 @@
+import 'dart:async';
+import 'dart:math';
+
 import 'package:feature_core/feature_core.dart';
 import 'package:feature_flutter_example/_main_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
 
-class TestFeaturesProvider extends FeaturesProvider {
-  TestFeaturesProvider()
-      : super(
-          name: 'Test Provider',
-          key: 'test_provider',
-        );
+final class TestFeaturesProvider extends FeaturesProvider {
+  TestFeaturesProvider() : super(key: 'test_provider');
 
   @override
   Future<Iterable<FeatureAbstract>> pullFeatures() async {
@@ -19,18 +18,38 @@ class TestFeaturesProvider extends FeaturesProvider {
   }
 }
 
+final class TestPeriodicFeaturesProvider extends FeaturesProvider {
+  TestPeriodicFeaturesProvider() : super(key: 'test_periodic_provider') {
+    Timer.periodic(const Duration(seconds: 5), (timer) {
+      requestPullFeatures();
+    });
+  }
+
+  @override
+  Future<Iterable<FeatureAbstract>> pullFeatures() async {
+    final rnd = Random();
+    return [
+      FeatureGeneric(
+        key: 'dynamicFeature',
+        value: rnd.nextInt(100),
+      ),
+    ];
+  }
+}
+
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
   final features = FeaturesManager(
     providers: [
       TestFeaturesProvider(),
+      TestPeriodicFeaturesProvider(),
     ],
   );
 
   await features.forceReloadFeatures();
 
-  GetIt.instance.registerSingleton(features);
+  GetIt.instance.registerSingleton<IFeaturesManager>(features);
 
   runApp(const MyApp());
 }

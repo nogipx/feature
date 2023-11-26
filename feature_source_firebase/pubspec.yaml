@@ -1,7 +1,7 @@
 name: feature_source_firebase
 description: Plugin for feature_core. 
   Implements Firebase Remote Config as feature provider.
-version: 1.2.1
+version: 2.0.0
 repository: https://github.com/nogipx/feature
 
 environment:
@@ -10,7 +10,6 @@ environment:
 dependencies:
   feature_core: ^1.2.0
   firebase_remote_config: ^4.3.5
-  meta: ^1.11.0
 
 dependency_overrides:
   feature_core:

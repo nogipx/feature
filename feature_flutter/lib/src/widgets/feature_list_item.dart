@@ -69,7 +69,7 @@ class FeatureDefaultListItem extends StatelessWidget {
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           Text(
-            '${feature.key}',
+            feature.key,
             style: Theme.of(context).textTheme.titleMedium,
           ),
           const SizedBox(height: 4),
