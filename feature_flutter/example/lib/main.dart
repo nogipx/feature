@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:math';
 
 import 'package:feature_core/feature_core.dart';
+import 'package:feature_flutter/feature_flutter.dart';
 import 'package:feature_flutter_example/_main_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
@@ -25,13 +26,21 @@ final class TestPeriodicFeaturesProvider extends FeaturesProvider {
     });
   }
 
+  bool _switch = false;
+
   @override
   Future<Iterable<FeatureAbstract>> pullFeatures() async {
     final rnd = Random();
+    _switch = !_switch;
+
     return [
       FeatureGeneric(
         key: 'dynamicFeature',
         value: rnd.nextInt(100),
+      ),
+      FeatureGeneric(
+        key: 'dynamicBool',
+        value: _switch,
       ),
     ];
   }
@@ -59,13 +68,16 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Flutter Demo',
-      theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
-        useMaterial3: true,
+    return FeaturesInherited(
+      manager: GetIt.instance.get(),
+      child: MaterialApp(
+        title: 'Flutter Demo',
+        theme: ThemeData(
+          colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
+          useMaterial3: true,
+        ),
+        home: const MainScreen(title: 'Flutter Demo Home Page'),
       ),
-      home: const MainScreen(title: 'Flutter Demo Home Page'),
     );
   }
 }

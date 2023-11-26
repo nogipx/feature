@@ -63,19 +63,21 @@ class FeatureWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final manager = FeaturesInherited.of(context)?.manager;
+    final manager = FeaturesInherited.getManager(context);
 
     return StreamBuilder<MappedFeatures>(
-      stream: manager?.featuresStream,
+      stream: manager.featuresStream,
       builder: (context, snapshot) {
         final feature =
-            snapshot.data?[featureKey] ?? manager?.features[featureKey];
+            snapshot.data?[featureKey] ?? manager.features[featureKey];
 
         const empty = SizedBox();
 
         if (!visible) {
           return empty;
-        } else if (feature == null) {
+        }
+
+        if (feature == null) {
           return type == _Type.builder
               ? builder?.call(context, feature) ?? empty
               : child ?? empty;
@@ -84,9 +86,30 @@ class FeatureWidget extends StatelessWidget {
         if (type == _Type.builder) {
           return builder?.call(context, feature) ?? empty;
         } else {
-          return activatedChild ?? empty;
+          final value = feature.value;
+          return value is bool
+              ? _buildChildByBool(feature)
+              : _buildChildByExist(feature);
         }
       },
     );
+  }
+
+  Widget _buildChildByBool(FeatureAbstract feature) {
+    return Builder(builder: (context) {
+      const empty = SizedBox();
+
+      final enabled = feature.value as bool;
+      return (enabled ? activatedChild : child) ?? empty;
+    });
+  }
+
+  Widget _buildChildByExist(FeatureAbstract feature) {
+    return Builder(builder: (context) {
+      const empty = SizedBox();
+
+      final exists = feature.value != null;
+      return (exists ? activatedChild : child) ?? empty;
+    });
   }
 }

@@ -1,3 +1,6 @@
+import 'dart:async';
+
+import 'package:feature_flutter/feature_flutter.dart';
 import 'package:feature_flutter_example/_features_screen.dart';
 import 'package:flutter/material.dart';
 
@@ -12,11 +15,28 @@ class MainScreen extends StatefulWidget {
 
 class _MainScreenState extends State<MainScreen> {
   int _counter = 0;
+  late final StreamSubscription? _sub;
 
   void _incrementCounter() {
     setState(() {
       _counter++;
     });
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    _sub = FeaturesInherited.getManager(context).featuresStream.listen((event) {
+      setState(() {
+        _counter = event['dynamicFeature']?.value ?? 0;
+      });
+    });
+  }
+
+  @override
+  void dispose() {
+    _sub?.cancel();
+    super.dispose();
   }
 
   @override
@@ -47,6 +67,34 @@ class _MainScreenState extends State<MainScreen> {
               '$_counter',
               style: Theme.of(context).textTheme.headlineMedium,
             ),
+            ClipRRect(
+              borderRadius: const BorderRadius.all(
+                Radius.circular(16),
+              ),
+              child: FeatureWidget(
+                // This function will switch the red/green color because
+                // the function widget reacts to the bool value as switches
+                featureKey: 'dynamicBool',
+                activatedChild: const SizedBox(
+                  height: 40,
+                  width: 80,
+                  child: ColoredBox(color: Colors.green),
+                ),
+                // child: const ColoredBox(color: Colors.red),
+              ),
+            ),
+            FeatureWidget(
+              featureKey: 'feature3',
+              activatedChild: const Text(
+                'This will not shown because "feature3" not exists.',
+              ),
+            ),
+            FeatureWidget.builder(
+              featureKey: 'feature1',
+              builder: (context, feature) {
+                return Text(feature?.value);
+              },
+            )
           ],
         ),
       ),

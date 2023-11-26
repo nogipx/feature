@@ -10,8 +10,20 @@ class FeaturesInherited extends InheritedWidget {
     Key? key,
   }) : super(child: child, key: key);
 
-  static FeaturesInherited? of(BuildContext context) =>
-      context.getInheritedWidgetOfExactType<FeaturesInherited>();
+  static FeaturesInherited of(BuildContext context) {
+    final widget = context.getInheritedWidgetOfExactType<FeaturesInherited>();
+    assert(
+      widget != null,
+      'The FeaturesInherited widget was not found. '
+      'Perhaps you forgot to inject it into the widget tree?',
+    );
+    return widget!;
+  }
+
+  static IFeaturesManager getManager(BuildContext context) {
+    final widget = of(context);
+    return widget.manager;
+  }
 
   @override
   bool updateShouldNotify(covariant InheritedWidget oldWidget) {
