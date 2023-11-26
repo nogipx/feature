@@ -78,10 +78,11 @@ class FeatureDefaultListItem extends StatelessWidget {
                   style: Theme.of(context).textTheme.titleMedium,
                 ),
               ),
-              if (isOverridden)
-                const Icon(
+              if (feature.value is bool)
+                Icon(
                   Icons.edit,
-                  color: Colors.orange,
+                  size: 20,
+                  color: isOverridden ? Colors.orange : Colors.grey,
                 )
             ],
           ),

@@ -21,7 +21,7 @@ final class TestFeaturesProvider extends FeaturesProvider {
 
 final class TestPeriodicFeaturesProvider extends FeaturesProvider {
   TestPeriodicFeaturesProvider() : super(key: 'test_periodic_provider') {
-    Timer.periodic(const Duration(seconds: 5), (timer) {
+    Timer.periodic(const Duration(seconds: 3), (timer) {
       requestPullFeatures();
     });
   }

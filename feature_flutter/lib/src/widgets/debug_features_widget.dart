@@ -59,7 +59,11 @@ class _DebugFeaturesWidgetState extends State<DebugFeaturesWidget> {
   }
 
   Future<void> _onEditBoolFeature(FeatureAbstract feature) async {
-    final value = feature.value;
+    final mainColor = Theme.of(context).colorScheme.primary.withOpacity(.3);
+
+    final isActive = feature.value;
+    final isOverridden = widget.manager.isOverridden(feature.key);
+
     await showDialog(
       context: context,
       builder: (context) {
@@ -69,22 +73,20 @@ class _DebugFeaturesWidgetState extends State<DebugFeaturesWidget> {
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               const SizedBox(height: 16),
-              RadioListTile(
-                value: true,
-                groupValue: value,
-                title: const Text('Включить'),
-                onChanged: (_) {
+              ListTile(
+                title: const Text('Set "true" value'),
+                tileColor: isOverridden && isActive ? mainColor : null,
+                onTap: () {
                   widget.manager.overrideFeature(
                     feature.copyWith(value: true),
                   );
                   Navigator.of(context).pop();
                 },
               ),
-              RadioListTile(
-                value: false,
-                groupValue: value,
-                title: const Text('Выключить'),
-                onChanged: (_) {
+              ListTile(
+                title: const Text('Set "false" value'),
+                tileColor: isOverridden && !isActive ? mainColor : null,
+                onTap: () {
                   widget.manager.overrideFeature(
                     feature.copyWith(value: false),
                   );
@@ -94,7 +96,7 @@ class _DebugFeaturesWidgetState extends State<DebugFeaturesWidget> {
               Padding(
                 padding: const EdgeInsets.all(8.0),
                 child: OutlinedButton(
-                  child: const Text('Сбросить'),
+                  child: const Text('Reset'),
                   onPressed: () {
                     widget.manager.clearOverrides(
                       key: feature.key,
