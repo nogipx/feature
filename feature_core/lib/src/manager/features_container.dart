@@ -36,6 +36,16 @@ base class FeaturesContainer implements IFeaturesContainer {
     addOrReplaceFeature(newFeature);
   }
 
+  @override
+  void removeFeature(String key) {
+    _features.remove(key);
+  }
+
+  @override
+  void clearAllFeatures() {
+    _features.clear();
+  }
+
   void _guardAllFeaturesKeysUnique(Iterable<FeatureAbstract> features) {
     final keys = <String, int>{};
     for (final feature in features) {

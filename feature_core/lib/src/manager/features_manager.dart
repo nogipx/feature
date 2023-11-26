@@ -18,6 +18,7 @@ base class FeaturesManager implements IFeaturesManager {
   })  : _providers = providers ?? [],
         _updateListener = updateListener,
         _featuresContainer = featuresContainer ?? FeaturesContainer(),
+        _overriddenFeaturesContainer = FeaturesContainer(),
         _logger = logger ?? Logger('FeaturesManager'),
         _streamController = StreamController() {
     for (final provider in _providers) {
@@ -31,15 +32,17 @@ base class FeaturesManager implements IFeaturesManager {
   final Logger _logger;
 
   final List<FeaturesProvider> _providers;
-  final IFeaturesContainer _featuresContainer;
   final _updater = _FeaturesProviderUpdater();
+
+  final IFeaturesContainer _featuresContainer;
+  final IFeaturesContainer _overriddenFeaturesContainer;
 
   final void Function(MappedFeatures)? _updateListener;
 
   final StreamController<MappedFeatures> _streamController;
 
   @override
-  MappedFeatures get features => _featuresContainer.features;
+  MappedFeatures get features => _composeWithOverrides;
 
   @override
   late final featuresStream = _streamController.stream.asBroadcastStream();
@@ -53,7 +56,28 @@ base class FeaturesManager implements IFeaturesManager {
   Future<void> forceReloadFeatures() async {
     final features = await PullFeaturesUseCase(_providers).run();
     _featuresContainer.replaceAllFeatures(features);
-    _onUpdate(_featuresContainer.features);
+    _onUpdate();
+  }
+
+  @override
+  bool isOverridden(String key) {
+    return _overriddenFeaturesContainer.containsFeature(key);
+  }
+
+  @override
+  void clearOverrides({String? key}) {
+    if (key != null) {
+      _overriddenFeaturesContainer.removeFeature(key);
+    } else {
+      _overriddenFeaturesContainer.clearAllFeatures();
+    }
+    _onUpdate();
+  }
+
+  @override
+  void overrideFeature(FeatureAbstract feature) {
+    _overriddenFeaturesContainer.addOrReplaceFeature(feature);
+    _onUpdate();
   }
 
   @override
@@ -81,11 +105,25 @@ base class FeaturesManager implements IFeaturesManager {
         }
       }
     }
-    _onUpdate(_featuresContainer.features);
+    _onUpdate();
+  }
+
+  MappedFeatures get _composeWithOverrides {
+    if (_overriddenFeaturesContainer.features.isEmpty) {
+      return _featuresContainer.features;
+    }
+
+    final originalFeatures = Map.of(_featuresContainer.features);
+    final overrides = _overriddenFeaturesContainer.features;
+    for (final entry in overrides.entries) {
+      originalFeatures[entry.key] = entry.value;
+    }
+    return Map.unmodifiable(originalFeatures);
   }
 
   @protected
-  void _onUpdate(MappedFeatures features) {
+  void _onUpdate() {
+    final features = _composeWithOverrides;
     _updateListener?.call(features);
     _streamController.sink.add(features);
   }

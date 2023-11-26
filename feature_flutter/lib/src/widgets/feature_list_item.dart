@@ -17,12 +17,14 @@ class FeatureDefaultListItem extends StatelessWidget {
   final FeatureAbstract feature;
   final VoidCallback? onTap;
   final FeatureExtra? extra;
+  final bool isOverridden;
 
   const FeatureDefaultListItem({
     Key? key,
     required this.feature,
     this.onTap,
     this.extra,
+    this.isOverridden = false,
   }) : super(key: key);
 
   static const _radius = BorderRadius.all(Radius.circular(12));
@@ -68,9 +70,20 @@ class FeatureDefaultListItem extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Text(
-            feature.key,
-            style: Theme.of(context).textTheme.titleMedium,
+          Row(
+            children: [
+              Expanded(
+                child: Text(
+                  feature.key,
+                  style: Theme.of(context).textTheme.titleMedium,
+                ),
+              ),
+              if (isOverridden)
+                const Icon(
+                  Icons.edit,
+                  color: Colors.orange,
+                )
+            ],
           ),
           const SizedBox(height: 4),
           Wrap(

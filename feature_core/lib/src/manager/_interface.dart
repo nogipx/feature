@@ -9,6 +9,12 @@ abstract interface class IFeaturesManager {
 
   Future<void> forceReloadFeatures();
 
+  bool isOverridden(String key);
+
+  void overrideFeature(FeatureAbstract feature);
+
+  void clearOverrides({String? key});
+
   void dispose();
 }
 
@@ -24,6 +30,10 @@ abstract interface class IFeaturesContainer {
   void addOrReplaceFeature(FeatureAbstract newFeature);
 
   void updateFeature(FeatureAbstract newFeature);
+
+  void removeFeature(String key);
+
+  void clearAllFeatures();
 }
 
 typedef MappedFeatures = Map<String, FeatureAbstract>;
